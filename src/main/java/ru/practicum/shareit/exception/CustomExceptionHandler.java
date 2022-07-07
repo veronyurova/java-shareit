@@ -24,8 +24,8 @@ public class CustomExceptionHandler {
         List<ErrorResponse> errors = new ArrayList<>();
         for (FieldError error : e.getBindingResult().getFieldErrors()) {
             errors.add(new ErrorResponse("ValidationException",
-                                         error.getField() + " " +
-                                         error.getDefaultMessage()));
+                    error.getField() + " " +
+                            error.getDefaultMessage()));
             log.warn("MethodArgumentNotValidException: {}.{} {}",
                      error.getObjectName(), error.getField(), error.getDefaultMessage());
         }
@@ -40,8 +40,8 @@ public class CustomExceptionHandler {
         List<ErrorResponse> errors = new ArrayList<>();
         for (ConstraintViolation<?> violation : e.getConstraintViolations()) {
             errors.add(new ErrorResponse("ValidationException",
-                                         violation.getPropertyPath().toString() + " " +
-                                         violation.getMessage()));
+                    violation.getPropertyPath().toString() + " " +
+                            violation.getMessage()));
             log.warn("ConstraintViolationException: {} {}",
                      violation.getPropertyPath().toString(),
                      violation.getMessage());
@@ -83,11 +83,11 @@ public class CustomExceptionHandler {
     public ErrorResponse handleEmailAlreadyTakenException(EmailAlreadyTakenException e) {
         return new ErrorResponse("EmailAlreadyTaken", e.getMessage());
     }
-}
 
-@Getter
-@AllArgsConstructor
-class ErrorResponse {
-    String error;
-    String description;
+    @Getter
+    @AllArgsConstructor
+    class ErrorResponse {
+        String error;
+        String description;
+    }
 }
