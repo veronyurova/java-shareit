@@ -1,7 +1,9 @@
 package ru.practicum.shareit.item;
 
+import lombok.Getter;
 import lombok.AllArgsConstructor;
 
+@Getter
 @AllArgsConstructor
 public class ItemDto {
     private Long id;
@@ -9,8 +11,8 @@ public class ItemDto {
     private String description;
     private Boolean available;
     private User owner;
-    private Long request;
 
+    @Getter
     @AllArgsConstructor
     static class User {
         private Long id;

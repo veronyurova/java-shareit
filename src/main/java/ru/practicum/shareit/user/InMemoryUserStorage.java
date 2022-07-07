@@ -2,13 +2,13 @@ package ru.practicum.shareit.user;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
-import ru.practicum.shareit.exception.EmailAlreadyTakenException;
 import ru.practicum.shareit.exception.UserNotFoundException;
+import ru.practicum.shareit.exception.EmailAlreadyTakenException;
 
-import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
+import java.util.ArrayList;
 
 @Slf4j
 @Repository
@@ -42,13 +42,17 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public User updateUser(User newUser) {
-        User user = findUserById(newUser.getId());
-        if (!user.getEmail().equals(newUser.getEmail())) {
-            checkEmailAvailability(newUser.getEmail());
+    public User updateUser(Long id, User newUser) {
+        User user = findUserById(id);
+        if (newUser.getName() != null && !newUser.getName().isBlank()) {
+            user.setName(newUser.getName());
         }
-        user.setName(newUser.getName());
-        user.setEmail(newUser.getEmail());
+        if (newUser.getEmail() != null && !newUser.getEmail().isBlank()) {
+            if (!user.getEmail().equals(newUser.getEmail())) {
+                checkEmailAvailability(newUser.getEmail());
+            }
+            user.setEmail(newUser.getEmail());
+        }
         log.info("InMemoryUserStorage.updateUser: user {} " +
                  "successfully updated", user.getId());
         return user;

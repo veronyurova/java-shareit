@@ -2,17 +2,17 @@ package ru.practicum.shareit.user;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.beans.factory.annotation.Autowired;
-import ru.practicum.shareit.exception.ValidationException;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @Slf4j
 @Service
+@Validated
 public class UserServiceImpl implements UserService {
     private final UserStorage userStorage;
-    private final static String UNNECESSARY_ID_MESSAGE = "An id was passed for new user";
-    private final static String EMPTY_ID_MESSAGE = "An empty user id was passed";
 
     @Autowired
     public UserServiceImpl(UserStorage userStorage) {
@@ -30,22 +30,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User addUser(User user) {
-        if (user.getId() != null) {
-            log.warn("ValidationException at UserService.addUser: {}", UNNECESSARY_ID_MESSAGE);
-            throw new ValidationException(UNNECESSARY_ID_MESSAGE);
-        }
+    public User addUser(@Valid User user) {
         return userStorage.addUser(user);
     }
 
     @Override
     public User updateUser(Long id, User newUser) {
-        if (newUser.getId() == null) {
-            log.warn("ValidationException at UserService.updateUser: {}", EMPTY_ID_MESSAGE);
-            throw new ValidationException(EMPTY_ID_MESSAGE);
-        }
-        getUserById(newUser.getId());
-        return userStorage.updateUser(newUser);
+        return userStorage.updateUser(id, newUser);
     }
 
     @Override

@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping(path = "/users")
@@ -17,22 +18,28 @@ public class UserController {
     }
 
     @GetMapping
-    public List<User> getAllUsers() {
-        return userService.getAllUsers();
+    public List<UserDto> getAllUsers() {
+        return userService.getAllUsers()
+                .stream()
+                .map(UserMapper::toUserDto)
+                .collect(Collectors.toList());
     }
 
     @GetMapping("/{id}")
-    public User getUserById(@PathVariable Long id) {
-        return userService.getUserById(id);
+    public UserDto getUserById(@PathVariable Long id) {
+        return UserMapper.toUserDto(userService.getUserById(id));
     }
 
     @PostMapping
-    public User addUser(@Valid @RequestBody User user) {
+    public User addUser(@Valid @RequestBody UserDto userDto) {
+        User user = UserMapper.toUser(userDto);
         return userService.addUser(user);
     }
 
     @PatchMapping("/{id}")
-    public User updateUser(@PathVariable Long id, @Valid @RequestBody User newUser) {
+    public User updateUser(@PathVariable Long id,
+                           @Valid @RequestBody UserDto userDto) {
+        User newUser = UserMapper.toUser(userDto);
         return userService.updateUser(id, newUser);
     }
 
