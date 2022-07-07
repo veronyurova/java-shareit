@@ -14,7 +14,7 @@ import java.util.ArrayList;
 @Repository
 public class InMemoryUserStorage implements UserStorage {
     private final Map<Long, User> users = new HashMap<>();
-    private long id = 0;
+    private long nextUserId = 0;
 
     @Override
     public List<User> findAllUsers() {
@@ -60,6 +60,7 @@ public class InMemoryUserStorage implements UserStorage {
 
     @Override
     public void deleteUserById(Long id) {
+        findUserById(id);
         users.remove(id);
         log.info("InMemoryUserStorage.deleteUserById: user {} " +
                  "successfully deleted from storage", id);
@@ -76,7 +77,7 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     private Long getUserId() {
-        id += 1;
-        return id;
+        nextUserId += 1;
+        return nextUserId;
     }
 }

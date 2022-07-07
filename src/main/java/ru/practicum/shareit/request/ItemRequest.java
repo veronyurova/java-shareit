@@ -18,7 +18,6 @@ public class ItemRequest {
     @NotNull
     @NotBlank
     private String description;
-    @NotNull
     private User requestor;
     @NotNull
     @FutureOrPresent

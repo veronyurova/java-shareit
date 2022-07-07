@@ -26,9 +26,9 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<Item> getRequiredItems(String text) {
+    public List<Item> searchItems(String text) {
         if (text.isBlank()) return Collections.emptyList();
-        return itemStorage.findRequiredItems(text);
+        return itemStorage.searchItems(text);
     }
 
     @Override

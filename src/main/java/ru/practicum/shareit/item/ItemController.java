@@ -26,8 +26,8 @@ public class ItemController {
     }
 
     @GetMapping("/search")
-    public List<ItemDto> getRequiredItems(@RequestParam String text) {
-        return itemService.getRequiredItems(text)
+    public List<ItemDto> searchItems(@RequestParam String text) {
+        return itemService.searchItems(text)
                 .stream()
                 .map(ItemMapper::toItemDto)
                 .collect(Collectors.toList());
@@ -39,17 +39,17 @@ public class ItemController {
     }
 
     @PostMapping
-    public Item addItem(@RequestHeader("X-Sharer-User-Id") Long userId,
-                        @Valid @RequestBody ItemDto itemDto) {
+    public ItemDto addItem(@RequestHeader("X-Sharer-User-Id") Long userId,
+                           @Valid @RequestBody ItemDto itemDto) {
         Item item = ItemMapper.toItem(itemDto);
-        return itemService.addItem(userId, item);
+        return ItemMapper.toItemDto(itemService.addItem(userId, item));
     }
 
     @PatchMapping("/{id}")
-    public Item updateItem(@RequestHeader("X-Sharer-User-Id") Long userId,
-                           @PathVariable Long id, @Valid @RequestBody ItemDto itemDto) {
+    public ItemDto updateItem(@RequestHeader("X-Sharer-User-Id") Long userId,
+                              @PathVariable Long id, @Valid @RequestBody ItemDto itemDto) {
         Item newItem = ItemMapper.toItem(itemDto);
-        return itemService.updateItem(userId, id, newItem);
+        return ItemMapper.toItemDto(itemService.updateItem(userId, id, newItem));
     }
 
     @DeleteMapping("/{id}")

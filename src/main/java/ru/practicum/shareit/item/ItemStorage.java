@@ -4,7 +4,7 @@ import java.util.List;
 
 public interface ItemStorage {
     List<Item> findOwnerItems(Long userId);
-    List<Item> findRequiredItems(String text);
+    List<Item> searchItems(String text);
     Item findItemById(Long id);
     Item addItem(Long userId, Item item);
     Item updateItem(Long userId, Long id, Item newItem);

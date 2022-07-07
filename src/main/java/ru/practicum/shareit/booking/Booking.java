@@ -7,8 +7,8 @@ import ru.practicum.shareit.item.Item;
 import ru.practicum.shareit.user.User;
 
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.FutureOrPresent;
 import javax.validation.constraints.Future;
+import javax.validation.constraints.FutureOrPresent;
 import java.time.LocalDate;
 
 @Getter
@@ -22,9 +22,7 @@ public class Booking {
     @NotNull
     @Future
     private LocalDate end;
-    @NotNull
     private Item item;
-    @NotNull
     private User booker;
     @NotNull
     private String status;

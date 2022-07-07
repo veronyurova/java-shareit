@@ -5,7 +5,7 @@ import java.util.List;
 
 public interface ItemService {
     List<Item> getOwnerItems(Long userId);
-    List<Item> getRequiredItems(String text);
+    List<Item> searchItems(String text);
     Item getItemById(Long id);
     Item addItem(Long userId, @Valid Item item);
     Item updateItem(Long userId, Long id, Item newItem);

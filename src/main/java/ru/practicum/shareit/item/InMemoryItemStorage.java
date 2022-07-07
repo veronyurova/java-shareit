@@ -15,9 +15,9 @@ import java.util.stream.Collectors;
 @Slf4j
 @Repository
 public class InMemoryItemStorage implements ItemStorage {
-    private final Map<Long, Item> items = new HashMap<>();
     private final InMemoryUserStorage userStorage;
-    private long id = 0;
+    private final Map<Long, Item> items = new HashMap<>();
+    private long nextItemId = 0;
 
     @Autowired
     public InMemoryItemStorage(InMemoryUserStorage userStorage) {
@@ -33,12 +33,14 @@ public class InMemoryItemStorage implements ItemStorage {
     }
 
     @Override
-    public List<Item> findRequiredItems(String text) {
+    public List<Item> searchItems(String text) {
         return items.values()
                 .stream()
-                .filter(item -> item.getAvailable() &&
-                       (item.getName().toLowerCase().contains(text.toLowerCase()) ||
-                        item.getDescription().toLowerCase().contains(text.toLowerCase())))
+                .filter(
+                        item -> item.getAvailable() &&
+                        (item.getName().toLowerCase().contains(text.toLowerCase()) ||
+                        item.getDescription().toLowerCase().contains(text.toLowerCase()))
+                )
                 .collect(Collectors.toList());
     }
 
@@ -66,7 +68,7 @@ public class InMemoryItemStorage implements ItemStorage {
     public Item updateItem(Long userId, Long id, Item newItem) {
         Item item = findItemById(id);
         if (!userId.equals(item.getOwner().getId())) {
-            String message = String.format("User %d is not allowed to change this item", userId);
+            String message = String.format("User %d is not allowed to change item %d", userId, id);
             log.warn("AccessDeniedException at InMemoryItemStorage.updateItem: {}", message);
             throw new AccessDeniedException(message);
         }
@@ -78,19 +80,25 @@ public class InMemoryItemStorage implements ItemStorage {
         }
         if (newItem.getAvailable() != null) item.setAvailable(newItem.getAvailable());
         log.info("InMemoryItemStorage.updateItem: item {} " +
-                "successfully updated", item.getId());
+                 "successfully updated", item.getId());
         return item;
     }
 
     @Override
     public void deleteItemById(Long userId, Long id) {
+        Item item = findItemById(id);
+        if (!userId.equals(item.getOwner().getId())) {
+            String message = String.format("User %d is not allowed to delete item %d", userId, id);
+            log.warn("AccessDeniedException at InMemoryItemStorage.deleteItemById: {}", message);
+            throw new AccessDeniedException(message);
+        }
         items.remove(id);
         log.info("InMemoryItemStorage.deleteItemById: item {} " +
-                "successfully deleted from storage", id);
+                 "successfully deleted from storage", id);
     }
 
     private Long getItemId() {
-        id += 1;
-        return id;
+        nextItemId += 1;
+        return nextItemId;
     }
 }
