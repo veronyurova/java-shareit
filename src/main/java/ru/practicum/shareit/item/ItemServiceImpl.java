@@ -50,4 +50,8 @@ public class ItemServiceImpl implements ItemService {
     public void deleteItemById(Long userId, Long id) {
         itemStorage.deleteItemById(userId, id);
     }
+
+    protected void deleteAllItems() {
+        itemStorage.deleteAllItems();
+    }
 }

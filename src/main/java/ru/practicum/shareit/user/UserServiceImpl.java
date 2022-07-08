@@ -43,4 +43,9 @@ public class UserServiceImpl implements UserService {
     public void deleteUserById(Long id) {
         userStorage.deleteUserById(id);
     }
+
+    @Override
+    public void deleteAllUsers() {
+        userStorage.deleteAllUsers();
+    }
 }

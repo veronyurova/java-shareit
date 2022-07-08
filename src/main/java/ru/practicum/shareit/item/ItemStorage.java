@@ -14,4 +14,6 @@ public interface ItemStorage {
     Item updateItem(Long userId, Long id, Item newItem);
 
     void deleteItemById(Long userId, Long id);
+
+    void deleteAllItems();
 }

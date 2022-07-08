@@ -66,6 +66,12 @@ public class InMemoryUserStorage implements UserStorage {
                  "successfully deleted from storage", id);
     }
 
+    @Override
+    public void deleteAllUsers() {
+        users.clear();
+        nextUserId = 0;
+    }
+
     private void checkEmailAvailability(String email) {
         for (User user : users.values()) {
             if (user.getEmail().equals(email)) {

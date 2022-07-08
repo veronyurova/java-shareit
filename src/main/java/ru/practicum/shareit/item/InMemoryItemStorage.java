@@ -97,6 +97,12 @@ public class InMemoryItemStorage implements ItemStorage {
                  "successfully deleted from storage", id);
     }
 
+    @Override
+    public void deleteAllItems() {
+        items.clear();
+        nextItemId = 0;
+    }
+
     private Long getItemId() {
         nextItemId += 1;
         return nextItemId;
