@@ -18,7 +18,7 @@ public class ItemRequest {
     @NotNull
     @NotBlank
     private String description;
-    private User requestor;
+    private User requester;
     @NotNull
     @FutureOrPresent
     private LocalDateTime created;

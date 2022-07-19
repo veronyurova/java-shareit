@@ -5,8 +5,8 @@ public class ItemRequestMapper {
         return new ItemRequestDto(
                 itemRequest.getId(),
                 itemRequest.getDescription(),
-                new ItemRequestDto.User(itemRequest.getRequestor().getId(),
-                                        itemRequest.getRequestor().getName()),
+                new ItemRequestDto.User(itemRequest.getRequester().getId(),
+                                        itemRequest.getRequester().getName()),
                 itemRequest.getCreated()
         );
     }
