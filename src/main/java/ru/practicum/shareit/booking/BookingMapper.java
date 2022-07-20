@@ -1,7 +1,7 @@
 package ru.practicum.shareit.booking;
 
 public class BookingMapper {
-    public static BookingDto toItemDto(Booking booking) {
+    public static BookingDto toBookingDto(Booking booking) {
         return new BookingDto(
                 booking.getId(),
                 booking.getStart(),
@@ -12,14 +12,14 @@ public class BookingMapper {
         );
     }
 
-    public static Booking toBooking(BookingDto bookingDto) {
+    public static Booking toBooking(BookingDtoAdd bookingDtoAdd) {
         return new Booking(
                 null,
-                bookingDto.getStart(),
-                bookingDto.getEnd(),
+                bookingDtoAdd.getStart(),
+                bookingDtoAdd.getEnd(),
                 null,
                 null,
-                bookingDto.getStatus()
+                null
         );
     }
 }

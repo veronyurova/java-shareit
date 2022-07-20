@@ -7,10 +7,9 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.UserServiceImpl;
-import ru.practicum.shareit.exception.ItemNotFoundException;
-import ru.practicum.shareit.exception.UserNotFoundException;
 import ru.practicum.shareit.exception.AccessDeniedException;
 
+import javax.persistence.EntityNotFoundException;
 import javax.validation.ConstraintViolationException;
 import java.util.List;
 
@@ -170,7 +169,7 @@ public class ItemServiceTests {
 
     @Test
     void getItemByIdNoSuchItem() {
-        assertThrows(ItemNotFoundException.class, () -> itemService.getItemById(1L));
+        assertThrows(EntityNotFoundException.class, () -> itemService.getItemById(1L));
     }
 
     @Test
@@ -210,7 +209,7 @@ public class ItemServiceTests {
 
     @Test
     void addItemNoSuchUser() {
-        assertThrows(UserNotFoundException.class, () -> itemService.addItem(1L, item1));
+        assertThrows(EntityNotFoundException.class, () -> itemService.addItem(1L, item1));
     }
 
     @Test
@@ -284,7 +283,7 @@ public class ItemServiceTests {
         itemService.addItem(1L, item1);
         Item itemUpd = new Item(null, "UPD", "UPD", false, null, null);
 
-        assertThrows(ItemNotFoundException.class, () -> itemService.updateItem(1L, 2L, itemUpd));
+        assertThrows(EntityNotFoundException.class, () -> itemService.updateItem(1L, 2L, itemUpd));
     }
 
     @Test
@@ -304,7 +303,7 @@ public class ItemServiceTests {
 
         itemService.deleteItemById(1L, 1L);
 
-        assertThrows(ItemNotFoundException.class, () -> itemService.getItemById(1L));
+        assertThrows(EntityNotFoundException.class, () -> itemService.getItemById(1L));
     }
 
     @Test

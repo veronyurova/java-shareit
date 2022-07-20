@@ -5,10 +5,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
-import ru.practicum.shareit.exception.UserNotFoundException;
-import ru.practicum.shareit.exception.EmailAlreadyTakenException;
 
+import javax.persistence.EntityNotFoundException;
 import javax.validation.ConstraintViolationException;
+import java.sql.SQLException;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -61,7 +61,7 @@ public class UserServiceTests {
 
     @Test
     void getUserByIdNoSuchUser() {
-        assertThrows(UserNotFoundException.class, () -> userService.getUserById(1L));
+        assertThrows(EntityNotFoundException.class, () -> userService.getUserById(1L));
     }
 
     @Test
@@ -79,7 +79,7 @@ public class UserServiceTests {
         userService.addUser(user1);
         User userEmail = new User(null, "User", "user1@yandex.ru");
 
-        assertThrows(EmailAlreadyTakenException.class, () -> userService.addUser(userEmail));
+        assertThrows(SQLException.class, () -> userService.addUser(userEmail));
     }
 
     @Test
@@ -157,7 +157,7 @@ public class UserServiceTests {
         userService.addUser(user2);
         User userUpd = new User(null, null, "user2@yandex.ru");
 
-        assertThrows(EmailAlreadyTakenException.class, () -> userService.updateUser(1L, userUpd));
+        assertThrows(SQLException.class, () -> userService.updateUser(1L, userUpd));
     }
 
     @Test
@@ -165,7 +165,7 @@ public class UserServiceTests {
         userService.addUser(user1);
         User userUpd = new User(null, "UPD", "upd@yandex.ru");
 
-        assertThrows(UserNotFoundException.class, () -> userService.updateUser(2L, userUpd));
+        assertThrows(EntityNotFoundException.class, () -> userService.updateUser(2L, userUpd));
     }
 
     @Test
@@ -174,11 +174,11 @@ public class UserServiceTests {
 
         userService.deleteUserById(1L);
 
-        assertThrows(UserNotFoundException.class, () -> userService.getUserById(1L));
+        assertThrows(EntityNotFoundException.class, () -> userService.getUserById(1L));
     }
 
     @Test
     void deleteUserByIdNoSuchUser() {
-        assertThrows(UserNotFoundException.class, () -> userService.deleteUserById(1L));
+        assertThrows(EntityNotFoundException.class, () -> userService.deleteUserById(1L));
     }
 }
