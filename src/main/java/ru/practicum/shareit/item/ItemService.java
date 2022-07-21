@@ -15,4 +15,6 @@ public interface ItemService {
     Item updateItem(Long userId, Long id, Item newItem);
 
     void deleteItemById(Long userId, Long id);
+
+    void addLastAndNextBooking(ItemDto itemDto);
 }

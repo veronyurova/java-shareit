@@ -7,7 +7,9 @@ public class ItemMapper {
                 item.getName(),
                 item.getDescription(),
                 item.getAvailable(),
-                new ItemDto.User(item.getOwner().getId(), item.getOwner().getName())
+                new ItemDto.User(item.getOwner().getId(), item.getOwner().getName()),
+                null,
+                null
         );
     }
 

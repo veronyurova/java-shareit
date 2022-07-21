@@ -4,14 +4,17 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.beans.factory.annotation.Autowired;
-import ru.practicum.shareit.exception.AccessDeniedException;
 import ru.practicum.shareit.user.UserService;
+import ru.practicum.shareit.booking.BookingRepository;
+import ru.practicum.shareit.exception.AccessDeniedException;
+
 
 import javax.persistence.EntityNotFoundException;
 import javax.validation.Valid;
+import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Collections;
 import java.util.Optional;
+import java.util.Collections;
 
 @Slf4j
 @Service
@@ -19,11 +22,14 @@ import java.util.Optional;
 public class ItemServiceImpl implements ItemService {
     private final ItemRepository itemRepository;
     private final UserService userService;
+    private final BookingRepository bookingRepository;
 
     @Autowired
-    public ItemServiceImpl(ItemRepository itemRepository, UserService userService) {
+    public ItemServiceImpl(ItemRepository itemRepository, UserService userService,
+                           BookingRepository bookingRepository) {
         this.itemRepository = itemRepository;
         this.userService = userService;
+        this.bookingRepository = bookingRepository;
     }
 
     @Override
@@ -90,5 +96,18 @@ public class ItemServiceImpl implements ItemService {
 
     protected void deleteAllItems() {
         itemRepository.deleteAll();
+    }
+
+    @Override
+    public void addLastAndNextBooking(ItemDto itemDto) {
+        itemDto.setLastBooking(
+                bookingRepository.findFirstByItemIdAndEndIsBeforeOrderByEndDesc(
+                        itemDto.getId(),
+                        LocalDateTime.now())
+        );
+        itemDto.setNextBooking(bookingRepository.findFirstByItemIdAndStartIsAfterOrderByStartAsc(
+                itemDto.getId(),
+                LocalDateTime.now())
+        );
     }
 }

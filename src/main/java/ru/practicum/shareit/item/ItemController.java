@@ -19,10 +19,12 @@ public class ItemController {
 
     @GetMapping
     public List<ItemDto> getOwnerItems(@RequestHeader("X-Sharer-User-Id") Long userId) {
-        return itemService.getOwnerItems(userId)
+        List<ItemDto> items = itemService.getOwnerItems(userId)
                 .stream()
                 .map(ItemMapper::toItemDto)
                 .collect(Collectors.toList());
+        items.forEach(itemService::addLastAndNextBooking);
+        return items;
     }
 
     @GetMapping("/search")
@@ -34,8 +36,13 @@ public class ItemController {
     }
 
     @GetMapping("/{id}")
-    public ItemDto getItemById(@PathVariable Long id) {
-        return ItemMapper.toItemDto(itemService.getItemById(id));
+    public ItemDto getItemById(@RequestHeader("X-Sharer-User-Id") Long userId,
+                               @PathVariable Long id) {
+        ItemDto itemDto = ItemMapper.toItemDto(itemService.getItemById(id));
+        if (userId.equals(itemDto.getOwner().getId())) {
+            itemService.addLastAndNextBooking(itemDto);
+        }
+        return itemDto;
     }
 
     @PostMapping
