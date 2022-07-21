@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.AllArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @AllArgsConstructor
@@ -15,6 +16,7 @@ public class ItemDto {
     private User owner;
     private Booking lastBooking;
     private Booking nextBooking;
+    private List<CommentDto> comments;
 
     public void setLastBooking(ru.practicum.shareit.booking.Booking booking) {
         if (booking != null) {
@@ -36,6 +38,10 @@ public class ItemDto {
                     booking.getEnd()
             );
         }
+    }
+
+    public void setComments(List<CommentDto> comments) {
+        this.comments = comments;
     }
 
     @Getter

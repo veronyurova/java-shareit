@@ -5,9 +5,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.beans.factory.annotation.Autowired;
 import ru.practicum.shareit.user.UserService;
+import ru.practicum.shareit.booking.Booking;
+import ru.practicum.shareit.booking.BookingStatus;
 import ru.practicum.shareit.booking.BookingRepository;
+import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.exception.AccessDeniedException;
-
 
 import javax.persistence.EntityNotFoundException;
 import javax.validation.Valid;
@@ -15,6 +17,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.Collections;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -23,13 +26,16 @@ public class ItemServiceImpl implements ItemService {
     private final ItemRepository itemRepository;
     private final UserService userService;
     private final BookingRepository bookingRepository;
+    private final CommentRepository commentRepository;
 
     @Autowired
     public ItemServiceImpl(ItemRepository itemRepository, UserService userService,
-                           BookingRepository bookingRepository) {
+                           BookingRepository bookingRepository,
+                           CommentRepository commentRepository) {
         this.itemRepository = itemRepository;
         this.userService = userService;
         this.bookingRepository = bookingRepository;
+        this.commentRepository = commentRepository;
     }
 
     @Override
@@ -58,7 +64,7 @@ public class ItemServiceImpl implements ItemService {
     public Item addItem(Long userId, @Valid Item item) {
         item.setOwner(userService.getUserById(userId));
         Item addedItem = itemRepository.save(item);
-        log.info("ItemServiceImpl.addItem: item {} successfully added", item.getId());
+        log.info("ItemServiceImpl.addItem: item {} successfully added", addedItem.getId());
         return addedItem;
     }
 
@@ -94,8 +100,21 @@ public class ItemServiceImpl implements ItemService {
         log.info("ItemServiceImpl.deleteItemById: item {} successfully deleted", id);
     }
 
-    protected void deleteAllItems() {
-        itemRepository.deleteAll();
+    @Override
+    public Comment addComment(Long userId, Long itemId, Comment comment) {
+        Booking booking = bookingRepository.findBookingByBookerIdAndStatusAndEndIsBefore(
+                userId, BookingStatus.APPROVED, LocalDateTime.now());
+        if (booking == null) {
+            String message = String.format("User %d haven't rented item %d", userId, itemId);
+            log.warn("ValidationException at ItemServiceImpl.addComment: {}", message);
+            throw new ValidationException(message);
+        }
+        comment.setItem(getItemById(itemId));
+        comment.setAuthor(userService.getUserById(userId));
+        Comment addedComment = commentRepository.save(comment);
+        log.info("ItemServiceImpl.addComment: comment {} successfully added",
+                 addedComment.getId());
+        return addedComment;
     }
 
     @Override
@@ -109,5 +128,18 @@ public class ItemServiceImpl implements ItemService {
                 itemDto.getId(),
                 LocalDateTime.now())
         );
+    }
+
+    @Override
+    public void addCommentsList(ItemDto itemDto) {
+        List<CommentDto> comments = commentRepository.findAllByItemId(itemDto.getId())
+                .stream()
+                .map(CommentMapper::toCommentDto)
+                .collect(Collectors.toList());
+        itemDto.setComments(comments);
+    }
+
+    protected void deleteAllItems() {
+        itemRepository.deleteAll();
     }
 }

@@ -24,6 +24,7 @@ public class ItemController {
                 .map(ItemMapper::toItemDto)
                 .collect(Collectors.toList());
         items.forEach(itemService::addLastAndNextBooking);
+        items.forEach(itemService::addCommentsList);
         return items;
     }
 
@@ -42,6 +43,7 @@ public class ItemController {
         if (userId.equals(itemDto.getOwner().getId())) {
             itemService.addLastAndNextBooking(itemDto);
         }
+        itemService.addCommentsList(itemDto);
         return itemDto;
     }
 
@@ -63,5 +65,13 @@ public class ItemController {
     public void deleteItemById(@RequestHeader("X-Sharer-User-Id") Long userId,
                                @PathVariable Long id) {
         itemService.deleteItemById(userId, id);
+    }
+
+    @PostMapping("/{itemId}/comment")
+    public CommentDto addComment(@RequestHeader("X-Sharer-User-Id") Long userId,
+                                 @PathVariable Long itemId,
+                                 @Valid @RequestBody CommentDto commentDto) {
+        Comment comment = CommentMapper.toComment(commentDto);
+        return CommentMapper.toCommentDto(itemService.addComment(userId, itemId, comment));
     }
 }

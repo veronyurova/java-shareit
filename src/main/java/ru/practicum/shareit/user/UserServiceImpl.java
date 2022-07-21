@@ -40,7 +40,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public User addUser(@Valid User user) {
         User addedUser = userRepository.save(user);
-        log.info("UserServiceImpl.addUser: user {} successfully added", user.getId());
+        log.info("UserServiceImpl.addUser: user {} successfully added", addedUser.getId());
         return addedUser;
     }
 

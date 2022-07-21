@@ -6,6 +6,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public interface BookingRepository extends JpaRepository<Booking, Long> {
+    Booking findBookingByBookerIdAndStatusAndEndIsBefore(Long userId, BookingStatus status,
+                                                         LocalDateTime now);
+
     List<Booking> findAllByBookerIdOrderByStartDesc(Long userId);
 
     List<Booking> findAllByBookerIdAndStatusOrderByStartDesc(Long userId, BookingStatus status);

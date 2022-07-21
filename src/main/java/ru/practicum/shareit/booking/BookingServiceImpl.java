@@ -130,7 +130,8 @@ public class BookingServiceImpl implements BookingService {
         booking.setBooker(userService.getUserById(userId));
         booking.setStatus(BookingStatus.WAITING);
         Booking addedBooking = bookingRepository.save(booking);
-        log.info("BookingServiceImpl.addBooking: booking {} successfully added", booking.getId());
+        log.info("BookingServiceImpl.addBooking: booking {} successfully added",
+                 addedBooking.getId());
         return addedBooking;
     }
 

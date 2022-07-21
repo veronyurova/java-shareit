@@ -16,5 +16,9 @@ public interface ItemService {
 
     void deleteItemById(Long userId, Long id);
 
+    Comment addComment(Long userId, Long itemId, Comment comment);
+
     void addLastAndNextBooking(ItemDto itemDto);
+
+    void addCommentsList(ItemDto itemDto);
 }
