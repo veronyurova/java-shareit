@@ -1,16 +1,13 @@
 package ru.practicum.shareit.booking;
 
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import ru.practicum.shareit.item.Item;
 import ru.practicum.shareit.user.User;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Future;
-import javax.validation.constraints.FutureOrPresent;
 import java.time.LocalDateTime;
 
 @Entity
@@ -23,12 +20,8 @@ public class Booking {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @NotNull
-    @FutureOrPresent
     @Column(name = "start_date")
     private LocalDateTime start;
-    @NotNull
-    @Future
     @Column(name = "end_date")
     private LocalDateTime end;
     @ManyToOne

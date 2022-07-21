@@ -11,5 +11,5 @@ public interface BookingService {
 
     Booking addBooking(Long userId, Long itemId, Booking booking);
 
-    Booking updateBookingStatus(Long userId, Long bookingId, boolean approved);
+    Booking updateBookingStatus(Long userId, Long bookingId, Boolean approved);
 }

@@ -1,12 +1,16 @@
 package ru.practicum.shareit.booking;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.core.convert.ConversionFailedException;
+import ru.practicum.shareit.exception.ValidationException;
 
 import javax.validation.Valid;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @RestController
 @RequestMapping(path = "/bookings")
 public class BookingController {
@@ -20,8 +24,16 @@ public class BookingController {
     @GetMapping
     public List<BookingDto> getRequesterBookings(@RequestHeader("X-Sharer-User-Id") Long userId,
                                                  @RequestParam(defaultValue = "ALL")
-                                                 BookingState state) {
-        return bookingService.getRequesterBookings(userId, state)
+                                                 String state) {
+        BookingState bookingState;
+        try {
+            bookingState = BookingState.valueOf(state);
+        } catch (IllegalArgumentException e) {
+            String message = String.format("Incorrect selection criteria %s", state);
+            log.warn("ValidationException at BookingController.getRequesterBookings: {}", message);
+            throw new ValidationException(message);
+        }
+        return bookingService.getRequesterBookings(userId, bookingState)
                 .stream()
                 .map(BookingMapper::toBookingDto)
                 .collect(Collectors.toList());
@@ -30,8 +42,16 @@ public class BookingController {
     @GetMapping("/owner")
     public List<BookingDto> getOwnerBookings(@RequestHeader("X-Sharer-User-Id") Long userId,
                                              @RequestParam(defaultValue = "ALL")
-                                             BookingState state) {
-        return bookingService.getOwnerBookings(userId, state)
+                                             String state) {
+        BookingState bookingState;
+        try {
+            bookingState = BookingState.valueOf(state);
+        } catch (ConversionFailedException e) {
+            String message = String.format("Incorrect selection criteria %s", state);
+            log.warn("ValidationException at BookingController.getOwnerBookings: {}", message);
+            throw new ValidationException(message);
+        }
+        return bookingService.getOwnerBookings(userId, bookingState)
                 .stream()
                 .map(BookingMapper::toBookingDto)
                 .collect(Collectors.toList());
@@ -54,8 +74,8 @@ public class BookingController {
     @PatchMapping("/{bookingId}")
     public BookingDto updateBookingStatus(@RequestHeader("X-Sharer-User-Id") Long userId,
                                           @PathVariable Long bookingId,
-                                          @RequestParam boolean approved) {
-        return BookingMapper.toBookingDto(bookingService.updateBookingStatus(userId,
-                bookingId, approved));
+                                          @RequestParam Boolean approved) {
+        return BookingMapper.toBookingDto(bookingService.updateBookingStatus(userId, bookingId,
+                approved));
     }
 }
