@@ -24,9 +24,9 @@ public class BookingServiceTests {
     private final BookingService bookingService;
     private final UserService userService;
     private final ItemService itemService;
-    private final Booking booking1 = new Booking(null, LocalDateTime.now(),
+    private final Booking booking1 = new Booking(null, LocalDateTime.now().plusMinutes(10),
             LocalDateTime.now().plusDays(1L), null, null, null);
-    private final Booking booking2 = new Booking(null, LocalDateTime.now(),
+    private final Booking booking2 = new Booking(null, LocalDateTime.now().plusMinutes(5),
             LocalDateTime.now().plusDays(1L), null, null, null);
     private final Booking booking3 = new Booking(null, LocalDateTime.now(),
             LocalDateTime.now().plusDays(1L), null, null, null);
@@ -109,12 +109,11 @@ public class BookingServiceTests {
         bookingService.addBooking(1L, 2L, booking2);
         bookingService.addBooking(2L, 3L, booking3);
 
-        List<Booking> bookings = bookingService.getRequesterBookings(1L, BookingState.CURRENT);
+        List<Booking> bookings = bookingService.getRequesterBookings(2L, BookingState.CURRENT);
 
         assertNotNull(bookings);
-        assertEquals(2, bookings.size());
-        assertEquals(1L, bookings.get(0).getId());
-        assertEquals(2L, bookings.get(1).getId());
+        assertEquals(1, bookings.size());
+        assertEquals(3L, bookings.get(0).getId());
     }
 
     @Test
@@ -155,8 +154,9 @@ public class BookingServiceTests {
         List<Booking> bookings = bookingService.getRequesterBookings(1L, BookingState.FUTURE);
 
         assertNotNull(bookings);
-        assertEquals(1, bookings.size());
+        assertEquals(2, bookings.size());
         assertEquals(1L, bookings.get(0).getId());
+        assertEquals(2L, bookings.get(1).getId());
     }
 
     @Test
@@ -241,12 +241,11 @@ public class BookingServiceTests {
         bookingService.addBooking(3L, 2L, booking2);
         bookingService.addBooking(3L, 3L, booking3);
 
-        List<Booking> bookings = bookingService.getOwnerBookings(1L, BookingState.CURRENT);
+        List<Booking> bookings = bookingService.getOwnerBookings(2L, BookingState.CURRENT);
 
         assertNotNull(bookings);
-        assertEquals(2, bookings.size());
-        assertEquals(1L, bookings.get(0).getId());
-        assertEquals(2L, bookings.get(1).getId());
+        assertEquals(1, bookings.size());
+        assertEquals(3L, bookings.get(0).getId());
     }
 
     @Test
