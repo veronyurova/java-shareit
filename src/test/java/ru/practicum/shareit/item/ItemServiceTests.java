@@ -3,10 +3,10 @@ package ru.practicum.shareit.item;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.junit.jupiter.api.AfterEach;
+import org.springframework.test.annotation.DirtiesContext;
 import org.junit.jupiter.api.Test;
 import ru.practicum.shareit.user.User;
-import ru.practicum.shareit.user.UserServiceImpl;
+import ru.practicum.shareit.user.UserService;
 import ru.practicum.shareit.exception.AccessDeniedException;
 
 import javax.persistence.EntityNotFoundException;
@@ -17,20 +17,15 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class ItemServiceTests {
-    private final ItemServiceImpl itemService;
-    private final UserServiceImpl userService;
+    private final ItemService itemService;
+    private final UserService userService;
     private final User user1 = new User(null, "User 1", "user1@yandex.ru");
     private final User user2 = new User(null, "User 2", "user2@yandex.ru");
     private final Item item1 = new Item(null, "Item 1", "Test", true, null, null);
     private final Item item2 = new Item(null, "Item 2", "Test", true, null, null);
     private final Item item3 = new Item(null, "Item 3", "Test", true, null, null);
-
-    @AfterEach
-    void afterEach() {
-        itemService.deleteAllItems();
-        userService.deleteAllUsers();
-    }
 
     @Test
     void getOwnerItems() {

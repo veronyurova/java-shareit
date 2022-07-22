@@ -3,27 +3,23 @@ package ru.practicum.shareit.user;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.junit.jupiter.api.AfterEach;
+import org.springframework.test.annotation.DirtiesContext;
 import org.junit.jupiter.api.Test;
+import org.springframework.dao.DataIntegrityViolationException;
 
 import javax.persistence.EntityNotFoundException;
 import javax.validation.ConstraintViolationException;
-import java.sql.SQLException;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class UserServiceTests {
-    private final UserServiceImpl userService;
+    private final UserService userService;
     private final User user1 = new User(null, "User 1", "user1@yandex.ru");
     private final User user2 = new User(null, "User 2", "user2@yandex.ru");
-
-    @AfterEach
-    void afterEach() {
-        userService.deleteAllUsers();
-    }
 
     @Test
     void getAllUsers() {
@@ -79,7 +75,7 @@ public class UserServiceTests {
         userService.addUser(user1);
         User userEmail = new User(null, "User", "user1@yandex.ru");
 
-        assertThrows(SQLException.class, () -> userService.addUser(userEmail));
+        assertThrows(DataIntegrityViolationException.class, () -> userService.addUser(userEmail));
     }
 
     @Test
@@ -157,7 +153,8 @@ public class UserServiceTests {
         userService.addUser(user2);
         User userUpd = new User(null, null, "user2@yandex.ru");
 
-        assertThrows(SQLException.class, () -> userService.updateUser(1L, userUpd));
+        assertThrows(DataIntegrityViolationException.class,
+                () -> userService.updateUser(1L, userUpd));
     }
 
     @Test

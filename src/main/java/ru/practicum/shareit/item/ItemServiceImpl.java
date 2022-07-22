@@ -122,11 +122,13 @@ public class ItemServiceImpl implements ItemService {
         itemDto.setLastBooking(
                 bookingRepository.findFirstByItemIdAndEndIsBeforeOrderByEndDesc(
                         itemDto.getId(),
-                        LocalDateTime.now())
+                        LocalDateTime.now()
+                )
         );
         itemDto.setNextBooking(bookingRepository.findFirstByItemIdAndStartIsAfterOrderByStartAsc(
                 itemDto.getId(),
-                LocalDateTime.now())
+                LocalDateTime.now()
+                )
         );
     }
 
@@ -137,9 +139,5 @@ public class ItemServiceImpl implements ItemService {
                 .map(CommentMapper::toCommentDto)
                 .collect(Collectors.toList());
         itemDto.setComments(comments);
-    }
-
-    protected void deleteAllItems() {
-        itemRepository.deleteAll();
     }
 }

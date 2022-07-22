@@ -64,9 +64,4 @@ public class UserServiceImpl implements UserService {
         userRepository.deleteById(id);
         log.info("UserServiceImpl.deleteUserById: user {} successfully deleted", id);
     }
-
-    @Override
-    public void deleteAllUsers() {
-        userRepository.deleteAll();
-    }
 }
