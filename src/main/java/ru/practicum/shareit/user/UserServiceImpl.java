@@ -9,6 +9,7 @@ import javax.persistence.EntityNotFoundException;
 import javax.validation.Valid;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -22,31 +23,42 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<User> getAllUsers() {
-        return userRepository.findAll();
+    public List<UserDto> getAllUsers() {
+        return userRepository.findAll()
+                .stream()
+                .map(UserMapper::toUserDto)
+                .collect(Collectors.toList());
     }
 
     @Override
-    public User getUserById(Long id) {
-        Optional<User> user = userRepository.findById(id);
+    public UserDto getUserById(Long userId) {
+        Optional<User> user = userRepository.findById(userId);
         if (user.isEmpty()) {
-            String message = String.format("There is no user with id %d", id);
+            String message = String.format("There is no user with id %d", userId);
             log.warn("EntityNotFoundException at UserServiceImpl.getUserById: {}", message);
             throw new EntityNotFoundException(message);
         }
-        return user.get();
+        return UserMapper.toUserDto(user.get());
     }
 
     @Override
-    public User addUser(@Valid User user) {
+    public UserDto addUser(@Valid UserDto userDto) {
+        User user = UserMapper.toUserAdd(userDto);
         User addedUser = userRepository.save(user);
         log.info("UserServiceImpl.addUser: user {} successfully added", addedUser.getId());
-        return addedUser;
+        return UserMapper.toUserDto(addedUser);
     }
 
     @Override
-    public User updateUser(Long id, User newUser) {
-        User user = getUserById(id);
+    public UserDto updateUser(Long userId, UserDto userDto) {
+        Optional<User> userOptional = userRepository.findById(userId);
+        if (userOptional.isEmpty()) {
+            String message = String.format("There is no user with id %d", userId);
+            log.warn("EntityNotFoundException at UserServiceImpl.getUserById: {}", message);
+            throw new EntityNotFoundException(message);
+        }
+        User user = userOptional.get();
+        @Valid User newUser = UserMapper.toUserAdd(userDto);
         if (newUser.getName() != null && !newUser.getName().isBlank()) {
             user.setName(newUser.getName());
         }
@@ -55,13 +67,13 @@ public class UserServiceImpl implements UserService {
         }
         User updatedUser = userRepository.save(user);
         log.info("UserServiceImpl.updateUser: user {} successfully updated", user.getId());
-        return updatedUser;
+        return UserMapper.toUserDto(updatedUser);
     }
 
     @Override
-    public void deleteUserById(Long id) {
-        getUserById(id);
-        userRepository.deleteById(id);
-        log.info("UserServiceImpl.deleteUserById: user {} successfully deleted", id);
+    public void deleteUserById(Long userId) {
+        getUserById(userId);
+        userRepository.deleteById(userId);
+        log.info("UserServiceImpl.deleteUserById: user {} successfully deleted", userId);
     }
 }

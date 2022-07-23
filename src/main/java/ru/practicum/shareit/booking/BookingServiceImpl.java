@@ -3,18 +3,25 @@ package ru.practicum.shareit.booking;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import ru.practicum.shareit.exception.ValidationException;
-import ru.practicum.shareit.item.Item;
+import ru.practicum.shareit.item.ItemDto;
+import ru.practicum.shareit.item.ItemMapper;
 import ru.practicum.shareit.item.ItemService;
+import ru.practicum.shareit.user.UserMapper;
 import ru.practicum.shareit.user.UserService;
 
 import javax.persistence.EntityNotFoundException;
+import javax.validation.Valid;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
+@Validated
 public class BookingServiceImpl implements BookingService {
     private final BookingRepository bookingRepository;
     private final UserService userService;
@@ -29,65 +36,91 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<Booking> getRequesterBookings(Long userId, BookingState state) {
-        switch (state) {
+    public List<BookingDto> getRequesterBookings(Long userId, String state) {
+        BookingState bookingState;
+        try {
+            bookingState = BookingState.valueOf(state);
+        } catch (IllegalArgumentException e) {
+            String message = String.format("Incorrect selection criteria %s", state);
+            log.warn("ValidationException at BookingService.getRequesterBookings: {}", message);
+            throw new ValidationException(message);
+        }
+        List<Booking> bookings = new ArrayList<>();
+        switch (bookingState) {
             case ALL:
-                return bookingRepository.findAllByBookerIdOrderByStartDesc(userId);
+                bookings = bookingRepository.findAllByBookerIdOrderByStartDesc(userId);
+                break;
             case PAST:
-                return bookingRepository.findAllByBookerIdAndEndIsBeforeOrderByStartDesc(
+                bookings = bookingRepository.findAllByBookerIdAndEndIsBeforeOrderByStartDesc(
                         userId, LocalDateTime.now());
+                break;
             case FUTURE:
-                return bookingRepository.findAllByBookerIdAndStartIsAfterOrderByStartDesc(
+                bookings = bookingRepository.findAllByBookerIdAndStartIsAfterOrderByStartDesc(
                         userId, LocalDateTime.now());
+                break;
             case CURRENT:
-                return bookingRepository
+                bookings = bookingRepository
                         .findAllByBookerIdAndStartIsBeforeAndEndIsAfterOrderByStartDesc(
                                 userId, LocalDateTime.now(), LocalDateTime.now());
+                break;
             case WAITING:
-                return bookingRepository.findAllByBookerIdAndStatusOrderByStartDesc(
+                bookings = bookingRepository.findAllByBookerIdAndStatusOrderByStartDesc(
                         userId, BookingStatus.WAITING);
+                break;
             case REJECTED:
-                return bookingRepository.findAllByBookerIdAndStatusOrderByStartDesc(
+                bookings = bookingRepository.findAllByBookerIdAndStatusOrderByStartDesc(
                         userId, BookingStatus.REJECTED);
-            default:
-                String message = String.format("Incorrect selection criteria %s", state);
-                log.warn("ValidationException at BookingServiceImpl.getRequesterBookings: {}",
-                         message);
-                throw new ValidationException(message);
+                break;
         }
+        return bookings.stream()
+                .map(BookingMapper::toBookingDto)
+                .collect(Collectors.toList());
     }
 
     @Override
-    public List<Booking> getOwnerBookings(Long userId, BookingState state) {
-        switch (state) {
+    public List<BookingDto> getOwnerBookings(Long userId, String state) {
+        BookingState bookingState;
+        try {
+            bookingState = BookingState.valueOf(state);
+        } catch (IllegalArgumentException e) {
+            String message = String.format("Incorrect selection criteria %s", state);
+            log.warn("ValidationException at BookingService.getOwnerBookings: {}", message);
+            throw new ValidationException(message);
+        }
+        List<Booking> bookings = new ArrayList<>();
+        switch (bookingState) {
             case ALL:
-                return bookingRepository.findAllByItemOwnerIdOrderByStartDesc(userId);
+                bookings = bookingRepository.findAllByItemOwnerIdOrderByStartDesc(userId);
+                break;
             case PAST:
-                return bookingRepository.findAllByItemOwnerIdAndEndIsBeforeOrderByStartDesc(
+                bookings = bookingRepository.findAllByItemOwnerIdAndEndIsBeforeOrderByStartDesc(
                         userId, LocalDateTime.now());
+                break;
             case FUTURE:
-                return bookingRepository.findAllByItemOwnerIdAndStartIsAfterOrderByStartDesc(
+                bookings = bookingRepository.findAllByItemOwnerIdAndStartIsAfterOrderByStartDesc(
                         userId, LocalDateTime.now());
+                break;
             case CURRENT:
-                return bookingRepository
+                bookings = bookingRepository
                         .findAllByItemOwnerIdAndStartIsBeforeAndEndIsAfterOrderByStartDesc(
                                 userId, LocalDateTime.now(), LocalDateTime.now());
+                break;
             case WAITING:
-                return bookingRepository.findAllByItemOwnerIdAndStatusOrderByStartDesc(
+                bookings = bookingRepository.findAllByItemOwnerIdAndStatusOrderByStartDesc(
                         userId, BookingStatus.WAITING);
+                break;
             case REJECTED:
-                return bookingRepository.findAllByItemOwnerIdAndStatusOrderByStartDesc(
+                bookings = bookingRepository.findAllByItemOwnerIdAndStatusOrderByStartDesc(
                         userId, BookingStatus.REJECTED);
-            default:
-                String message = String.format("Incorrect search parameter %s", state);
-                log.warn("ValidationException at BookingServiceImpl.getOwnerBookings: {}",
-                         message);
-                throw new ValidationException(message);
+                break;
         }
+        return bookings.stream()
+                .map(BookingMapper::toBookingDto)
+                .collect(Collectors.toList());
     }
 
     @Override
-    public Booking getBookingById(Long userId, Long bookingId) {
+    public BookingDto getBookingById(Long userId, Long bookingId) {
         Optional<Booking> bookingOptional = bookingRepository.findById(bookingId);
         if (bookingOptional.isEmpty()) {
             String message = String.format("There is no booking with id %d", bookingId);
@@ -99,24 +132,24 @@ public class BookingServiceImpl implements BookingService {
                 !userId.equals(booking.getBooker().getId())) {
             String message = String.format("User %d is not allowed to view booking %d",
                                            userId, booking.getId());
-            log.warn("EntityNotFoundException at BookingServiceImpl.getBookingById: " +
-                     "{}", message);
+            log.warn("EntityNotFoundException at BookingServiceImpl.getBookingById: {}", message);
             throw new EntityNotFoundException(message);
         }
-        return booking;
+        return BookingMapper.toBookingDto(booking);
     }
 
     @Override
-    public Booking addBooking(Long userId, Long itemId, Booking booking) {
-        Item item = itemService.getItemById(itemId);
-        if (userId.equals(item.getOwner().getId())) {
+    public BookingDto addBooking(Long userId, Long itemId, @Valid BookingDtoAdd bookingDtoAdd) {
+        ItemDto itemDto = itemService.getItemById(userId, itemId);
+        Booking booking = BookingMapper.toBookingAdd(bookingDtoAdd);
+        if (userId.equals(itemDto.getOwner().getId())) {
             String message = String.format("User %d is not allowed to book his own item %d",
-                                           userId, item.getId());
+                                           userId, itemDto.getId());
             log.warn("EntityNotFoundException at BookingServiceImpl.addBooking: {}", message);
             throw new EntityNotFoundException(message);
         }
-        if (!item.getAvailable()) {
-            String message = String.format("Item %d is unavailable for booking", item.getId());
+        if (!itemDto.getAvailable()) {
+            String message = String.format("Item %d is unavailable for booking", itemDto.getId());
             log.warn("ValidationException at BookingServiceImpl.addBooking: {}", message);
             throw new ValidationException(message);
         }
@@ -126,23 +159,31 @@ public class BookingServiceImpl implements BookingService {
             log.warn("ValidationException at BookingServiceImpl.addBooking: {}", message);
             throw new ValidationException(message);
         }
-        booking.setItem(item);
-        booking.setBooker(userService.getUserById(userId));
+        booking.setItem(ItemMapper.toItem(itemDto));
+        booking.setBooker(UserMapper.toUser(userService.getUserById(userId)));
         booking.setStatus(BookingStatus.WAITING);
         Booking addedBooking = bookingRepository.save(booking);
         log.info("BookingServiceImpl.addBooking: booking {} successfully added",
                  addedBooking.getId());
-        return addedBooking;
+        return BookingMapper.toBookingDto(addedBooking);
     }
 
     @Override
-    public Booking updateBookingStatus(Long userId, Long bookingId, Boolean approved) {
-        Booking booking = getBookingById(userId, bookingId);
-        if (!userId.equals(booking.getItem().getOwner().getId())) {
+    public BookingDto updateBookingStatus(Long userId, Long bookingId, Boolean approved) {
+        Optional<Booking> bookingOptional = bookingRepository.findById(bookingId);
+        if (bookingOptional.isEmpty()) {
+            String message = String.format("There is no booking with id %d", bookingId);
+            log.warn("EntityNotFoundException at BookingServiceImpl.updateBookingStatus: {}",
+                     message);
+            throw new EntityNotFoundException(message);
+        }
+        Booking booking = bookingOptional.get();
+        ItemDto itemDto = itemService.getItemById(userId, booking.getItem().getId());
+        if (!userId.equals(itemDto.getOwner().getId())) {
             String message = String.format("User %d is not allowed to change booking %d",
                                            userId, booking.getId());
-            log.warn("EntityNotFoundException at BookingServiceImpl.updateBookingStatus: " +
-                     "{}", message);
+            log.warn("EntityNotFoundException at BookingServiceImpl.updateBookingStatus: {}",
+                     message);
             throw new EntityNotFoundException(message);
         }
         if (booking.getStatus().equals(BookingStatus.APPROVED)) {
@@ -160,6 +201,6 @@ public class BookingServiceImpl implements BookingService {
         Booking updatedBooking = bookingRepository.save(booking);
         log.info("BookingServiceImpl.updateBookingStatus: booking {} " +
                  "status successfully updated", booking.getId());
-        return updatedBooking;
+        return BookingMapper.toBookingDto(updatedBooking);
     }
 }

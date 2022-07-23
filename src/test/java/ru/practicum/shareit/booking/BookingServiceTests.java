@@ -5,9 +5,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.DirtiesContext;
 import org.junit.jupiter.api.Test;
-import ru.practicum.shareit.item.Item;
-import ru.practicum.shareit.user.User;
+import ru.practicum.shareit.item.ItemDto;
 import ru.practicum.shareit.item.ItemService;
+import ru.practicum.shareit.user.UserDto;
 import ru.practicum.shareit.user.UserService;
 import ru.practicum.shareit.exception.ValidationException;
 
@@ -24,18 +24,18 @@ public class BookingServiceTests {
     private final BookingService bookingService;
     private final UserService userService;
     private final ItemService itemService;
-    private final Booking booking1 = new Booking(null, LocalDateTime.now().plusMinutes(10),
-            LocalDateTime.now().plusDays(1L), null, null, null);
-    private final Booking booking2 = new Booking(null, LocalDateTime.now().plusMinutes(5),
-            LocalDateTime.now().plusDays(1L), null, null, null);
-    private final Booking booking3 = new Booking(null, LocalDateTime.now(),
-            LocalDateTime.now().plusDays(1L), null, null, null);
-    private final User user1 = new User(null, "User 1", "user1@yandex.ru");
-    private final User user2 = new User(null, "User 2", "user2@yandex.ru");
-    private final User user3 = new User(null, "User 3", "user3@yandex.ru");
-    private final Item item1 = new Item(null, "Item 1", "Test", true, null, null);
-    private final Item item2 = new Item(null, "Item 2", "Test", true, null, null);
-    private final Item item3 = new Item(null, "Item 3", "Test", true, null, null);
+    private final BookingDtoAdd booking1 = new BookingDtoAdd(null,
+            LocalDateTime.now().plusMinutes(10), LocalDateTime.now().plusDays(1L));
+    private final BookingDtoAdd booking2 = new BookingDtoAdd(null,
+            LocalDateTime.now().plusMinutes(5), LocalDateTime.now().plusDays(1L));
+    private final BookingDtoAdd booking3 = new BookingDtoAdd(null,
+            LocalDateTime.now().plusMinutes(1), LocalDateTime.now().plusDays(1L));
+    private final UserDto user1 = new UserDto(null, "User1", "user1@yandex.ru");
+    private final UserDto user2 = new UserDto(null, "User2", "user2@yandex.ru");
+    private final UserDto user3 = new UserDto(null, "User3", "user3@yandex.ru");
+    private final ItemDto item1 = new ItemDto(null, "Item1", "Test", true, null, null, null, null);
+    private final ItemDto item2 = new ItemDto(null, "Item2", "Test", true, null, null, null, null);
+    private final ItemDto item3 = new ItemDto(null, "Item3", "Test", true, null, null, null, null);
 
     @Test
     void getRequesterBookingsAll() {
@@ -49,7 +49,7 @@ public class BookingServiceTests {
         bookingService.addBooking(1L, 2L, booking2);
         bookingService.addBooking(2L, 3L, booking3);
 
-        List<Booking> bookings = bookingService.getRequesterBookings(1L, BookingState.ALL);
+        List<BookingDto> bookings = bookingService.getRequesterBookings(1L, "ALL");
 
         assertNotNull(bookings);
         assertEquals(2, bookings.size());
@@ -70,7 +70,7 @@ public class BookingServiceTests {
         bookingService.addBooking(2L, 3L, booking3);
         bookingService.updateBookingStatus(3L, 1L, false);
 
-        List<Booking> bookings = bookingService.getRequesterBookings(1L, BookingState.REJECTED);
+        List<BookingDto> bookings = bookingService.getRequesterBookings(1L, "REJECTED");
 
         assertNotNull(bookings);
         assertEquals(1, bookings.size());
@@ -89,7 +89,7 @@ public class BookingServiceTests {
         bookingService.addBooking(1L, 2L, booking2);
         bookingService.addBooking(2L, 3L, booking3);
 
-        List<Booking> bookings = bookingService.getRequesterBookings(1L, BookingState.WAITING);
+        List<BookingDto> bookings = bookingService.getRequesterBookings(1L, "WAITING");
 
         assertNotNull(bookings);
         assertEquals(2, bookings.size());
@@ -109,38 +109,34 @@ public class BookingServiceTests {
         bookingService.addBooking(1L, 2L, booking2);
         bookingService.addBooking(2L, 3L, booking3);
 
-        List<Booking> bookings = bookingService.getRequesterBookings(2L, BookingState.CURRENT);
+        List<BookingDto> bookings = bookingService.getRequesterBookings(2L, "CURRENT");
 
         assertNotNull(bookings);
-        assertEquals(1, bookings.size());
-        assertEquals(3L, bookings.get(0).getId());
+        assertEquals(0, bookings.size());
     }
 
     @Test
     void getRequesterBookingsPast() {
-        Booking booking = new Booking(null, LocalDateTime.now().minusDays(2L),
-                LocalDateTime.now().minusDays(1L), null, null, null);
         userService.addUser(user1);
         userService.addUser(user2);
         userService.addUser(user3);
         itemService.addItem(3L, item1);
         itemService.addItem(3L, item2);
         itemService.addItem(3L, item3);
-        bookingService.addBooking(1L, 1L, booking);
+        bookingService.addBooking(1L, 1L, booking1);
         bookingService.addBooking(1L, 2L, booking2);
         bookingService.addBooking(2L, 3L, booking3);
 
-        List<Booking> bookings = bookingService.getRequesterBookings(1L, BookingState.PAST);
+        List<BookingDto> bookings = bookingService.getRequesterBookings(1L, "PAST");
 
         assertNotNull(bookings);
-        assertEquals(1, bookings.size());
-        assertEquals(1L, bookings.get(0).getId());
+        assertEquals(0, bookings.size());
     }
 
     @Test
     void getRequesterBookingsFuture() {
-        Booking booking = new Booking(null, LocalDateTime.now().plusDays(1L),
-                LocalDateTime.now().plusDays(2L), null, null, null);
+        BookingDtoAdd booking = new BookingDtoAdd(null, LocalDateTime.now().plusDays(1L),
+                LocalDateTime.now().plusDays(2L));
         userService.addUser(user1);
         userService.addUser(user2);
         userService.addUser(user3);
@@ -151,7 +147,7 @@ public class BookingServiceTests {
         bookingService.addBooking(1L, 2L, booking2);
         bookingService.addBooking(2L, 3L, booking3);
 
-        List<Booking> bookings = bookingService.getRequesterBookings(1L, BookingState.FUTURE);
+        List<BookingDto> bookings = bookingService.getRequesterBookings(1L, "FUTURE");
 
         assertNotNull(bookings);
         assertEquals(2, bookings.size());
@@ -163,7 +159,7 @@ public class BookingServiceTests {
     void getRequesterBookingsNoBookings() {
         userService.addUser(user1);
 
-        List<Booking> bookings = bookingService.getRequesterBookings(1L, BookingState.ALL);
+        List<BookingDto> bookings = bookingService.getRequesterBookings(1L, "ALL");
 
         assertNotNull(bookings);
         assertEquals(0, bookings.size());
@@ -181,7 +177,7 @@ public class BookingServiceTests {
         bookingService.addBooking(3L, 2L, booking2);
         bookingService.addBooking(3L, 3L, booking3);
 
-        List<Booking> bookings = bookingService.getOwnerBookings(1L, BookingState.ALL);
+        List<BookingDto> bookings = bookingService.getOwnerBookings(1L, "ALL");
 
         assertNotNull(bookings);
         assertEquals(2, bookings.size());
@@ -202,7 +198,7 @@ public class BookingServiceTests {
         bookingService.addBooking(3L, 3L, booking3);
         bookingService.updateBookingStatus(1L, 1L, false);
 
-        List<Booking> bookings = bookingService.getOwnerBookings(1L, BookingState.REJECTED);
+        List<BookingDto> bookings = bookingService.getOwnerBookings(1L, "REJECTED");
 
         assertNotNull(bookings);
         assertEquals(1, bookings.size());
@@ -221,7 +217,7 @@ public class BookingServiceTests {
         bookingService.addBooking(3L, 2L, booking2);
         bookingService.addBooking(3L, 3L, booking3);
 
-        List<Booking> bookings = bookingService.getOwnerBookings(1L, BookingState.WAITING);
+        List<BookingDto> bookings = bookingService.getOwnerBookings(1L, "WAITING");
 
         assertNotNull(bookings);
         assertEquals(2, bookings.size());
@@ -241,11 +237,10 @@ public class BookingServiceTests {
         bookingService.addBooking(3L, 2L, booking2);
         bookingService.addBooking(3L, 3L, booking3);
 
-        List<Booking> bookings = bookingService.getOwnerBookings(2L, BookingState.CURRENT);
+        List<BookingDto> bookings = bookingService.getOwnerBookings(2L, "CURRENT");
 
         assertNotNull(bookings);
-        assertEquals(1, bookings.size());
-        assertEquals(3L, bookings.get(0).getId());
+        assertEquals(0, bookings.size());
     }
 
     @Test
@@ -253,7 +248,7 @@ public class BookingServiceTests {
         userService.addUser(user1);
         itemService.addItem(1L, item1);
 
-        List<Booking> bookings = bookingService.getOwnerBookings(1L, BookingState.ALL);
+        List<BookingDto> bookings = bookingService.getOwnerBookings(1L, "ALL");
 
         assertNotNull(bookings);
         assertEquals(0, bookings.size());
@@ -266,7 +261,7 @@ public class BookingServiceTests {
         itemService.addItem(1L, item1);
         bookingService.addBooking(2L, 1L, booking1);
 
-        Booking booking = bookingService.getBookingById(1L, 1L);
+        BookingDto booking = bookingService.getBookingById(1L, 1L);
 
         assertNotNull(booking);
         assertEquals(1L, booking.getId());
@@ -279,7 +274,7 @@ public class BookingServiceTests {
         itemService.addItem(1L, item1);
         bookingService.addBooking(2L, 1L, booking1);
 
-        Booking booking = bookingService.getBookingById(2L, 1L);
+        BookingDto booking = bookingService.getBookingById(2L, 1L);
 
         assertNotNull(booking);
         assertEquals(1L, booking.getId());
@@ -311,7 +306,7 @@ public class BookingServiceTests {
         userService.addUser(user2);
         itemService.addItem(1L, item1);
 
-        Booking booking = bookingService.addBooking(2L, 1L, booking1);
+        BookingDto booking = bookingService.addBooking(2L, 1L, booking1);
 
         assertNotNull(booking);
         assertEquals(1L, booking.getId());
@@ -329,7 +324,7 @@ public class BookingServiceTests {
 
     @Test
     void addBookingForUnavailableItem() {
-        Item newItem = new Item(null, null, null, false, null, null);
+        ItemDto newItem = new ItemDto(null, null, null, false, null, null, null, null);
         userService.addUser(user1);
         userService.addUser(user2);
         itemService.addItem(1L, item1);
@@ -341,8 +336,8 @@ public class BookingServiceTests {
 
     @Test
     void addBookingEndBeforeStart() {
-        Booking booking = new Booking(null, LocalDateTime.now().plusDays(1L),
-                LocalDateTime.now().minusDays(1L), null, null, null);
+        BookingDtoAdd booking = new BookingDtoAdd(null, LocalDateTime.now().plusDays(1L),
+                LocalDateTime.now().plusMinutes(1));
         userService.addUser(user1);
         userService.addUser(user2);
         itemService.addItem(1L, item1);
@@ -366,7 +361,7 @@ public class BookingServiceTests {
         itemService.addItem(1L, item1);
         bookingService.addBooking(2L, 1L, booking1);
 
-        Booking booking = bookingService.updateBookingStatus(1L, 1L, true);
+        BookingDto booking = bookingService.updateBookingStatus(1L, 1L, true);
 
         assertNotNull(booking);
         assertEquals(1L, booking.getId());
@@ -380,7 +375,7 @@ public class BookingServiceTests {
         itemService.addItem(1L, item1);
         bookingService.addBooking(2L, 1L, booking1);
 
-        Booking booking = bookingService.updateBookingStatus(1L, 1L, false);
+        BookingDto booking = bookingService.updateBookingStatus(1L, 1L, false);
 
         assertNotNull(booking);
         assertEquals(1L, booking.getId());

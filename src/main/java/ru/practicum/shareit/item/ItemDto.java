@@ -3,6 +3,8 @@ package ru.practicum.shareit.item;
 import lombok.Getter;
 import lombok.AllArgsConstructor;
 
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -10,8 +12,13 @@ import java.util.List;
 @AllArgsConstructor
 public class ItemDto {
     private Long id;
+    @NotNull
+    @NotBlank
     private String name;
+    @NotNull
+    @NotBlank
     private String description;
+    @NotNull
     private Boolean available;
     private User owner;
     private Booking lastBooking;
@@ -46,14 +53,14 @@ public class ItemDto {
 
     @Getter
     @AllArgsConstructor
-    static class User {
+    public static class User {
         private Long id;
         private String name;
     }
 
     @Getter
     @AllArgsConstructor
-    static class Booking {
+    public static class Booking {
         private Long id;
         private Long bookerId;
         private LocalDateTime start;

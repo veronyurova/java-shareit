@@ -16,6 +16,17 @@ public class ItemMapper {
 
     public static Item toItem(ItemDto itemDto) {
         return new Item(
+                itemDto.getId(),
+                itemDto.getName(),
+                itemDto.getDescription(),
+                itemDto.getAvailable(),
+                null,
+                null
+        );
+    }
+
+    public static Item toItemAdd(ItemDto itemDto) {
+        return new Item(
                 null,
                 itemDto.getName(),
                 itemDto.getDescription(),
