@@ -54,7 +54,7 @@ public class UserServiceImpl implements UserService {
         Optional<User> userOptional = userRepository.findById(userId);
         if (userOptional.isEmpty()) {
             String message = String.format("There is no user with id %d", userId);
-            log.warn("EntityNotFoundException at UserServiceImpl.getUserById: {}", message);
+            log.warn("EntityNotFoundException at UserServiceImpl.updateUser: {}", message);
             throw new EntityNotFoundException(message);
         }
         User user = userOptional.get();

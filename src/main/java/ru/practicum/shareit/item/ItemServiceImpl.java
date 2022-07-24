@@ -87,7 +87,7 @@ public class ItemServiceImpl implements ItemService {
         Optional<Item> itemOptional = itemRepository.findById(itemId);
         if (itemOptional.isEmpty()) {
             String message = String.format("There is no item with id %d", itemId);
-            log.warn("EntityNotFoundException at ItemServiceImpl.getItemById: {}", message);
+            log.warn("EntityNotFoundException at ItemServiceImpl.updateItem: {}", message);
             throw new EntityNotFoundException(message);
         }
         Item item = itemOptional.get();
@@ -126,8 +126,8 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public CommentDto addComment(Long userId, Long itemId, @Valid CommentDto commentDto) {
         Comment comment = CommentMapper.toComment(commentDto);
-        Booking booking = bookingRepository.findBookingByBookerIdAndStatusAndEndIsBefore(
-                userId, BookingStatus.APPROVED, LocalDateTime.now());
+        Booking booking = bookingRepository.findCompletedBooking(userId, itemId,
+                BookingStatus.APPROVED, LocalDateTime.now());
         if (booking == null) {
             String message = String.format("User %d haven't rented item %d", userId, itemId);
             log.warn("ValidationException at ItemServiceImpl.addComment: {}", message);
@@ -143,17 +143,12 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public void addLastAndNextBooking(ItemDto itemDto) {
-        itemDto.setLastBooking(
-                bookingRepository.findFirstByItemIdAndEndIsBeforeOrderByEndDesc(
-                        itemDto.getId(),
-                        LocalDateTime.now()
-                )
-        );
-        itemDto.setNextBooking(bookingRepository.findFirstByItemIdAndStartIsAfterOrderByStartAsc(
-                itemDto.getId(),
-                LocalDateTime.now()
-                )
-        );
+        Optional<Booking> lastBooking = bookingRepository.findLastBookings(itemDto.getId(),
+                LocalDateTime.now()).stream().findFirst();
+        if (lastBooking.isPresent()) itemDto.setLastBooking(lastBooking.get());
+        Optional<Booking> nextBooking = bookingRepository.findNextBookings(itemDto.getId(),
+                LocalDateTime.now()).stream().findFirst();
+        if (nextBooking.isPresent()) itemDto.setNextBooking(nextBooking.get());
     }
 
     @Override
