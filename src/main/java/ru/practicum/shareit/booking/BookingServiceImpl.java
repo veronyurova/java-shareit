@@ -2,8 +2,8 @@ package ru.practicum.shareit.booking;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.beans.factory.annotation.Autowired;
 import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.item.ItemDto;
 import ru.practicum.shareit.item.ItemMapper;
@@ -132,25 +132,9 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public BookingDto addBooking(Long userId, Long itemId, @Valid BookingDtoAdd bookingDtoAdd) {
-        ItemDto itemDto = itemService.getItemById(userId, itemId);
         Booking booking = BookingMapper.toBookingAdd(bookingDtoAdd);
-        if (userId.equals(itemDto.getOwner().getId())) {
-            String message = String.format("User %d is not allowed to book his own item %d",
-                                           userId, itemDto.getId());
-            log.warn("EntityNotFoundException at BookingServiceImpl.addBooking: {}", message);
-            throw new EntityNotFoundException(message);
-        }
-        if (!itemDto.getAvailable()) {
-            String message = String.format("Item %d is unavailable for booking", itemDto.getId());
-            log.warn("ValidationException at BookingServiceImpl.addBooking: {}", message);
-            throw new ValidationException(message);
-        }
-        if (booking.getEnd().isBefore(booking.getStart())) {
-            String message = String.format("Booking end (%s) is before start (%s)",
-                                           booking.getEnd(), booking.getStart());
-            log.warn("ValidationException at BookingServiceImpl.addBooking: {}", message);
-            throw new ValidationException(message);
-        }
+        ItemDto itemDto = itemService.getItemById(userId, itemId);
+        validateDataForAddBooking(userId, itemDto, booking);
         booking.setItem(ItemMapper.toItem(itemDto));
         booking.setBooker(UserMapper.toUser(userService.getUserById(userId)));
         booking.setStatus(BookingStatus.WAITING);
@@ -171,11 +155,41 @@ public class BookingServiceImpl implements BookingService {
         }
         Booking booking = bookingOptional.get();
         ItemDto itemDto = itemService.getItemById(userId, booking.getItem().getId());
+        validateDataForStatusUpdate(userId, itemDto, booking);
+        if (approved) booking.setStatus(BookingStatus.APPROVED);
+        if (!approved) booking.setStatus(BookingStatus.REJECTED);
+        Booking updatedBooking = bookingRepository.save(booking);
+        log.info("BookingServiceImpl.updateBookingStatus: booking {} " +
+                 "status successfully updated", booking.getId());
+        return BookingMapper.toBookingDto(updatedBooking);
+    }
+
+    private void validateDataForAddBooking (Long userId, ItemDto itemDto, Booking booking) {
+        if (userId.equals(itemDto.getOwner().getId())) {
+            String message = String.format("User %d is not allowed to book his own item %d",
+                    userId, itemDto.getId());
+            log.warn("EntityNotFoundException at BookingServiceImpl.addBooking: {}", message);
+            throw new EntityNotFoundException(message);
+        }
+        if (!itemDto.getAvailable()) {
+            String message = String.format("Item %d is unavailable for booking", itemDto.getId());
+            log.warn("ValidationException at BookingServiceImpl.addBooking: {}", message);
+            throw new ValidationException(message);
+        }
+        if (booking.getEnd().isBefore(booking.getStart())) {
+            String message = String.format("Booking end (%s) is before start (%s)",
+                    booking.getEnd(), booking.getStart());
+            log.warn("ValidationException at BookingServiceImpl.addBooking: {}", message);
+            throw new ValidationException(message);
+        }
+    }
+
+    private void validateDataForStatusUpdate(Long userId, ItemDto itemDto, Booking booking) {
         if (!userId.equals(itemDto.getOwner().getId())) {
             String message = String.format("User %d is not allowed to change booking %d",
-                                           userId, booking.getId());
+                    userId, booking.getId());
             log.warn("EntityNotFoundException at BookingServiceImpl.updateBookingStatus: {}",
-                     message);
+                    message);
             throw new EntityNotFoundException(message);
         }
         if (booking.getStatus().equals(BookingStatus.APPROVED)) {
@@ -188,11 +202,5 @@ public class BookingServiceImpl implements BookingService {
             log.warn("ValidationException at BookingServiceImpl.updateBookingStatus: {}", message);
             throw new ValidationException(message);
         }
-        if (approved) booking.setStatus(BookingStatus.APPROVED);
-        if (!approved) booking.setStatus(BookingStatus.REJECTED);
-        Booking updatedBooking = bookingRepository.save(booking);
-        log.info("BookingServiceImpl.updateBookingStatus: booking {} " +
-                 "status successfully updated", booking.getId());
-        return BookingMapper.toBookingDto(updatedBooking);
     }
 }

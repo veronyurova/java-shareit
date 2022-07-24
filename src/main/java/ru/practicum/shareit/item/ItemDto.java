@@ -2,6 +2,7 @@ package ru.practicum.shareit.item;
 
 import lombok.Getter;
 import lombok.AllArgsConstructor;
+import ru.practicum.shareit.booking.Booking;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.NotBlank;
@@ -20,14 +21,14 @@ public class ItemDto {
     private String description;
     @NotNull
     private Boolean available;
-    private User owner;
-    private Booking lastBooking;
-    private Booking nextBooking;
+    private UserDto owner;
+    private BookingDto lastBooking;
+    private BookingDto nextBooking;
     private List<CommentDto> comments;
 
-    public void setLastBooking(ru.practicum.shareit.booking.Booking booking) {
+    public void setLastBooking(Booking booking) {
         if (booking != null) {
-            this.lastBooking = new Booking(
+            this.lastBooking = new BookingDto(
                     booking.getId(),
                     booking.getBooker().getId(),
                     booking.getStart(),
@@ -36,9 +37,9 @@ public class ItemDto {
         }
     }
 
-    public void setNextBooking(ru.practicum.shareit.booking.Booking booking) {
+    public void setNextBooking(Booking booking) {
         if (booking != null) {
-            this.nextBooking = new Booking(
+            this.nextBooking = new BookingDto(
                     booking.getId(),
                     booking.getBooker().getId(),
                     booking.getStart(),
@@ -53,14 +54,14 @@ public class ItemDto {
 
     @Getter
     @AllArgsConstructor
-    public static class User {
+    public static class UserDto {
         private Long id;
         private String name;
     }
 
     @Getter
     @AllArgsConstructor
-    public static class Booking {
+    public static class BookingDto {
         private Long id;
         private Long bookerId;
         private LocalDateTime start;

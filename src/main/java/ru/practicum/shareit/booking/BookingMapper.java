@@ -6,8 +6,8 @@ public class BookingMapper {
                 booking.getId(),
                 booking.getStart(),
                 booking.getEnd(),
-                new BookingDto.Item(booking.getItem().getId(), booking.getItem().getName()),
-                new BookingDto.User(booking.getBooker().getId(), booking.getBooker().getName()),
+                new BookingDto.ItemDto(booking.getItem().getId(), booking.getItem().getName()),
+                new BookingDto.UserDto(booking.getBooker().getId(), booking.getBooker().getName()),
                 booking.getStatus()
         );
     }
