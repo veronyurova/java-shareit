@@ -164,7 +164,7 @@ public class BookingServiceImpl implements BookingService {
         return BookingMapper.toBookingDto(updatedBooking);
     }
 
-    private void validateDataForAddBooking (Long userId, ItemDto itemDto, Booking booking) {
+    private void validateDataForAddBooking(Long userId, ItemDto itemDto, Booking booking) {
         if (userId.equals(itemDto.getOwner().getId())) {
             String message = String.format("User %d is not allowed to book his own item %d",
                     userId, itemDto.getId());
