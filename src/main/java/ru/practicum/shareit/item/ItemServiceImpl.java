@@ -4,6 +4,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
+import ru.practicum.shareit.request.ItemRequest;
+import ru.practicum.shareit.request.ItemRequestRepository;
 import ru.practicum.shareit.user.UserMapper;
 import ru.practicum.shareit.user.UserService;
 import ru.practicum.shareit.booking.Booking;
@@ -28,15 +30,18 @@ public class ItemServiceImpl implements ItemService {
     private final UserService userService;
     private final BookingRepository bookingRepository;
     private final CommentRepository commentRepository;
+    private final ItemRequestRepository itemRequestRepository;
 
     @Autowired
     public ItemServiceImpl(ItemRepository itemRepository, UserService userService,
                            BookingRepository bookingRepository,
-                           CommentRepository commentRepository) {
+                           CommentRepository commentRepository,
+                           ItemRequestRepository itemRequestRepository) {
         this.itemRepository = itemRepository;
         this.userService = userService;
         this.bookingRepository = bookingRepository;
         this.commentRepository = commentRepository;
+        this.itemRequestRepository = itemRequestRepository;
     }
 
     @Override
@@ -77,6 +82,8 @@ public class ItemServiceImpl implements ItemService {
     public ItemDto addItem(Long userId, @Valid ItemDto itemDto) {
         Item item = ItemMapper.toItemAdd(itemDto);
         item.setOwner(UserMapper.toUser(userService.getUserById(userId)));
+        Optional<ItemRequest> request = itemRequestRepository.findById(itemDto.getRequestId());
+        if (request.isPresent()) item.setRequest(request.get());
         Item addedItem = itemRepository.save(item);
         log.info("ItemServiceImpl.addItem: item {} successfully added", addedItem.getId());
         return ItemMapper.toItemDto(addedItem);
@@ -158,5 +165,13 @@ public class ItemServiceImpl implements ItemService {
                 .map(CommentMapper::toCommentDto)
                 .collect(Collectors.toList());
         itemDto.setComments(comments);
+    }
+
+    @Override
+    public List<ItemDto> getItemsByRequestId(Long requestId) {
+        return itemRepository.findByRequestId(requestId)
+                .stream()
+                .map(ItemMapper::toItemDto)
+                .collect(Collectors.toList());
     }
 }

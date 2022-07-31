@@ -21,4 +21,6 @@ public interface ItemService {
     void addLastAndNextBooking(ItemDto itemDto);
 
     void addCommentsList(ItemDto itemDto);
+
+    List<ItemDto> getItemsByRequestId(Long requestId);
 }
