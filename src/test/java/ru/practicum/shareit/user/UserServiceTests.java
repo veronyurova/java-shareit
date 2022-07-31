@@ -3,11 +3,11 @@ package ru.practicum.shareit.user;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.junit.jupiter.api.AfterEach;
+import org.springframework.test.annotation.DirtiesContext;
 import org.junit.jupiter.api.Test;
-import ru.practicum.shareit.exception.UserNotFoundException;
-import ru.practicum.shareit.exception.EmailAlreadyTakenException;
+import org.springframework.dao.DataIntegrityViolationException;
 
+import javax.persistence.EntityNotFoundException;
 import javax.validation.ConstraintViolationException;
 import java.util.List;
 
@@ -15,34 +15,26 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class UserServiceTests {
-    private final UserServiceImpl userService;
-    private final User user1 = new User(null, "User 1", "user1@yandex.ru");
-    private final User user2 = new User(null, "User 2", "user2@yandex.ru");
-
-    @AfterEach
-    void afterEach() {
-        userService.deleteAllUsers();
-    }
+    private final UserService userService;
+    private final UserDto user1 = new UserDto(null, "User 1", "user1@yandex.ru");
+    private final UserDto user2 = new UserDto(null, "User 2", "user2@yandex.ru");
 
     @Test
     void getAllUsers() {
         userService.addUser(user1);
         userService.addUser(user2);
-        User userExp1 = new User(1L, "User 1", "user1@yandex.ru");
-        User userExp2 = new User(2L, "User 2", "user2@yandex.ru");
-        List<User> usersExpected = List.of(userExp1, userExp2);
 
-        List<User> users = userService.getAllUsers();
+        List<UserDto> users = userService.getAllUsers();
 
         assertNotNull(users);
         assertEquals(2, users.size());
-        assertEquals(usersExpected, users);
     }
 
     @Test
     void getAllUsersNoUsers() {
-        List<User> users = userService.getAllUsers();
+        List<UserDto> users = userService.getAllUsers();
 
         assertNotNull(users);
         assertEquals(0, users.size());
@@ -51,54 +43,51 @@ public class UserServiceTests {
     @Test
     void getUserById() {
         userService.addUser(user1);
-        User userExp = new User(1L, "User 1", "user1@yandex.ru");
 
-        User user = userService.getUserById(1L);
+        UserDto user = userService.getUserById(1L);
 
         assertNotNull(user);
-        assertEquals(userExp, user);
+        assertEquals(1L, user.getId());
     }
 
     @Test
     void getUserByIdNoSuchUser() {
-        assertThrows(UserNotFoundException.class, () -> userService.getUserById(1L));
+        assertThrows(EntityNotFoundException.class, () -> userService.getUserById(1L));
     }
 
     @Test
     void addUser() {
-        User userExp = new User(1L, "User 1", "user1@yandex.ru");
-
-        User user = userService.addUser(user1);
+        UserDto user = userService.addUser(user1);
 
         assertNotNull(user);
-        assertEquals(userExp, user);
+        assertEquals(1L, user.getId());
     }
 
     @Test
     void addUserDuplicateEmail() {
         userService.addUser(user1);
-        User userEmail = new User(null, "User", "user1@yandex.ru");
+        UserDto userEmail = new UserDto(null, "User", "user1@yandex.ru");
 
-        assertThrows(EmailAlreadyTakenException.class, () -> userService.addUser(userEmail));
+        assertThrows(DataIntegrityViolationException.class, () -> userService.addUser(userEmail));
     }
 
     @Test
     void addUserIncorrectEmail() {
-        User user = new User(null, "User", "@yandex.ru");
+        UserDto user = new UserDto(null, "User", "@yandex.ru");
 
         assertThrows(ConstraintViolationException.class, () -> userService.addUser(user));
     }
 
     @Test
     void addUserNoName() {
-        User user = new User(null, null, "user1@yandex.ru");
+        UserDto user = new UserDto(null, null, "user1@yandex.ru");
 
         assertThrows(ConstraintViolationException.class, () -> userService.addUser(user));
     }
 
     @Test
     void addUserNoEmail() {
-        User user = new User(null, "User", null);
+        UserDto user = new UserDto(null, "User", null);
 
         assertThrows(ConstraintViolationException.class, () -> userService.addUser(user));
     }
@@ -106,66 +95,67 @@ public class UserServiceTests {
     @Test
     void updateUser() {
         userService.addUser(user1);
-        User userUpd = new User(null, "UPD", "upd@yandex.ru");
-        User userExp = new User(1L, "UPD", "upd@yandex.ru");
+        UserDto userUpd = new UserDto(null, "UPD", "upd@yandex.ru");
 
-        User user = userService.updateUser(1L, userUpd);
+        UserDto user = userService.updateUser(1L, userUpd);
 
         assertNotNull(user);
-        assertEquals(userExp, user);
+        assertEquals("UPD", user.getName());
+        assertEquals("upd@yandex.ru", user.getEmail());
     }
 
     @Test
     void updateName() {
         userService.addUser(user1);
-        User userUpd = new User(null, "UPD", null);
-        User userExp = new User(1L, "UPD", "user1@yandex.ru");
+        UserDto userUpd = new UserDto(null, "UPD", null);
 
-        User user = userService.updateUser(1L, userUpd);
+        UserDto user = userService.updateUser(1L, userUpd);
 
         assertNotNull(user);
-        assertEquals(userExp, user);
+        assertEquals("UPD", user.getName());
+        assertEquals("user1@yandex.ru", user.getEmail());
     }
 
     @Test
     void updateEmail() {
         userService.addUser(user1);
-        User userUpd = new User(null, null, "upd@yandex.ru");
-        User userExp = new User(1L, "User 1", "upd@yandex.ru");
+        UserDto userUpd = new UserDto(null, null, "upd@yandex.ru");
 
-        User user = userService.updateUser(1L, userUpd);
+        UserDto user = userService.updateUser(1L, userUpd);
 
         assertNotNull(user);
-        assertEquals(userExp, user);
+        assertEquals("User 1", user.getName());
+        assertEquals("upd@yandex.ru", user.getEmail());
     }
 
     @Test
     void updateUserBlankNameAndEmail() {
         userService.addUser(user1);
-        User userUpd = new User(null, "  ", "  ");
-        User userExp = new User(1L, "User 1", "user1@yandex.ru");
+        UserDto userUpd = new UserDto(null, "  ", "  ");
 
-        User user = userService.updateUser(1L, userUpd);
+        UserDto user = userService.updateUser(1L, userUpd);
 
         assertNotNull(user);
-        assertEquals(userExp, user);
+        assertEquals("User 1", user.getName());
+        assertEquals("user1@yandex.ru", user.getEmail());
     }
 
     @Test
     void updateDuplicateEmail() {
         userService.addUser(user1);
         userService.addUser(user2);
-        User userUpd = new User(null, null, "user2@yandex.ru");
+        UserDto userUpd = new UserDto(null, null, "user2@yandex.ru");
 
-        assertThrows(EmailAlreadyTakenException.class, () -> userService.updateUser(1L, userUpd));
+        assertThrows(DataIntegrityViolationException.class,
+                () -> userService.updateUser(1L, userUpd));
     }
 
     @Test
     void updateIncorrectId() {
         userService.addUser(user1);
-        User userUpd = new User(null, "UPD", "upd@yandex.ru");
+        UserDto userUpd = new UserDto(null, "UPD", "upd@yandex.ru");
 
-        assertThrows(UserNotFoundException.class, () -> userService.updateUser(2L, userUpd));
+        assertThrows(EntityNotFoundException.class, () -> userService.updateUser(2L, userUpd));
     }
 
     @Test
@@ -174,11 +164,11 @@ public class UserServiceTests {
 
         userService.deleteUserById(1L);
 
-        assertThrows(UserNotFoundException.class, () -> userService.getUserById(1L));
+        assertThrows(EntityNotFoundException.class, () -> userService.getUserById(1L));
     }
 
     @Test
     void deleteUserByIdNoSuchUser() {
-        assertThrows(UserNotFoundException.class, () -> userService.deleteUserById(1L));
+        assertThrows(EntityNotFoundException.class, () -> userService.deleteUserById(1L));
     }
 }

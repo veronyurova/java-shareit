@@ -3,14 +3,13 @@ package ru.practicum.shareit.item;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.junit.jupiter.api.AfterEach;
+import org.springframework.test.annotation.DirtiesContext;
 import org.junit.jupiter.api.Test;
-import ru.practicum.shareit.user.User;
-import ru.practicum.shareit.user.UserServiceImpl;
-import ru.practicum.shareit.exception.ItemNotFoundException;
-import ru.practicum.shareit.exception.UserNotFoundException;
+import ru.practicum.shareit.user.UserDto;
+import ru.practicum.shareit.user.UserService;
 import ru.practicum.shareit.exception.AccessDeniedException;
 
+import javax.persistence.EntityNotFoundException;
 import javax.validation.ConstraintViolationException;
 import java.util.List;
 
@@ -18,20 +17,18 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class ItemServiceTests {
-    private final ItemServiceImpl itemService;
-    private final UserServiceImpl userService;
-    private final User user1 = new User(null, "User 1", "user1@yandex.ru");
-    private final User user2 = new User(null, "User 2", "user2@yandex.ru");
-    private final Item item1 = new Item(null, "Item 1", "Test", true, null, null);
-    private final Item item2 = new Item(null, "Item 2", "Test", true, null, null);
-    private final Item item3 = new Item(null, "Item 3", "Test", true, null, null);
-
-    @AfterEach
-    void afterEach() {
-        itemService.deleteAllItems();
-        userService.deleteAllUsers();
-    }
+    private final ItemService itemService;
+    private final UserService userService;
+    private final UserDto user1 = new UserDto(null, "User 1", "user1@yandex.ru");
+    private final UserDto user2 = new UserDto(null, "User 2", "user2@yandex.ru");
+    private final ItemDto item1 = new ItemDto(null, "Item 1", "Test", true, null, null, null,
+            null);
+    private final ItemDto item2 = new ItemDto(null, "Item 2", "Test", true, null, null, null,
+            null);
+    private final ItemDto item3 = new ItemDto(null, "Item 3", "Test", true, null, null, null,
+            null);
 
     @Test
     void getOwnerItems() {
@@ -40,22 +37,20 @@ public class ItemServiceTests {
         itemService.addItem(1L, item1);
         itemService.addItem(1L, item2);
         itemService.addItem(2L, item3);
-        Item itemExp1 = new Item(1L, "Item 1", "Test", true, user1, null);
-        Item itemExp2 = new Item(2L, "Item 2", "Test", true, user1, null);
-        List<Item> itemsExpected = List.of(itemExp1, itemExp2);
 
-        List<Item> items = itemService.getOwnerItems(1L);
+        List<ItemDto> items = itemService.getOwnerItems(1L);
 
         assertNotNull(items);
         assertEquals(2, items.size());
-        assertEquals(itemsExpected, items);
+        assertEquals(1L, items.get(0).getId());
+        assertEquals(2L, items.get(1).getId());
     }
 
     @Test
     void getOwnerItemsNoItems() {
         userService.addUser(user1);
 
-        List<Item> items = itemService.getOwnerItems(1L);
+        List<ItemDto> items = itemService.getOwnerItems(1L);
 
         assertNotNull(items);
         assertEquals(0, items.size());
@@ -63,7 +58,7 @@ public class ItemServiceTests {
 
     @Test
     void getOwnerItemsNoSuchUser() {
-        List<Item> items = itemService.getOwnerItems(1L);
+        List<ItemDto> items = itemService.getOwnerItems(1L);
 
         assertNotNull(items);
         assertEquals(0, items.size());
@@ -73,65 +68,58 @@ public class ItemServiceTests {
     void searchItemsNameUpperCase() {
         userService.addUser(user1);
         itemService.addItem(1L, item1);
-        Item itemExp = new Item(1L, "Item 1", "Test", true, user1, null);
-        List<Item> itemsExpected = List.of(itemExp);
 
-        List<Item> items = itemService.searchItems("ITEM 1");
+        List<ItemDto> items = itemService.searchItems("ITEM 1");
 
         assertNotNull(items);
         assertEquals(1, items.size());
-        assertEquals(itemsExpected, items);
+        assertEquals(1L, items.get(0).getId());
     }
 
     @Test
     void searchItemsNameLowerCase() {
         userService.addUser(user1);
         itemService.addItem(1L, item1);
-        Item itemExp = new Item(1L, "Item 1", "Test", true, user1, null);
-        List<Item> itemsExpected = List.of(itemExp);
 
-        List<Item> items = itemService.searchItems("item 1");
+        List<ItemDto> items = itemService.searchItems("item 1");
 
         assertNotNull(items);
         assertEquals(1, items.size());
-        assertEquals(itemsExpected, items);
+        assertEquals(1L, items.get(0).getId());
     }
 
     @Test
     void searchItemsDescriptionUpperCase() {
         userService.addUser(user1);
         itemService.addItem(1L, item1);
-        Item itemExp = new Item(1L, "Item 1", "Test", true, user1, null);
-        List<Item> itemsExpected = List.of(itemExp);
 
-        List<Item> items = itemService.searchItems("TEST");
+        List<ItemDto> items = itemService.searchItems("TEST");
 
         assertNotNull(items);
         assertEquals(1, items.size());
-        assertEquals(itemsExpected, items);
+        assertEquals(1L, items.get(0).getId());
     }
 
     @Test
     void searchItemsDescriptionLowerCase() {
         userService.addUser(user1);
         itemService.addItem(1L, item1);
-        Item itemExp = new Item(1L, "Item 1", "Test", true, user1, null);
-        List<Item> itemsExpected = List.of(itemExp);
 
-        List<Item> items = itemService.searchItems("test");
+        List<ItemDto> items = itemService.searchItems("test");
 
         assertNotNull(items);
         assertEquals(1, items.size());
-        assertEquals(itemsExpected, items);
+        assertEquals(1L, items.get(0).getId());
     }
 
     @Test
     void searchItemsItemNotAvailable() {
-        Item item = new Item(1L, "Item 1", "Test", false, user1, null);
+        ItemDto itemUpd = new ItemDto(null, null, null, false, null, null, null, null);
         userService.addUser(user1);
-        itemService.addItem(1L, item);
+        itemService.addItem(1L, item1);
+        itemService.updateItem(1L, 1L, itemUpd);
 
-        List<Item> items = itemService.searchItems("Item 1");
+        List<ItemDto> items = itemService.searchItems("Item 1");
 
         assertNotNull(items);
         assertEquals(0, items.size());
@@ -142,7 +130,7 @@ public class ItemServiceTests {
         userService.addUser(user1);
         itemService.addItem(1L, item1);
 
-        List<Item> items = itemService.searchItems("");
+        List<ItemDto> items = itemService.searchItems("");
 
         assertNotNull(items);
         assertEquals(0, items.size());
@@ -150,7 +138,7 @@ public class ItemServiceTests {
 
     @Test
     void searchItemsNoItems() {
-        List<Item> items = itemService.searchItems("item");
+        List<ItemDto> items = itemService.searchItems("item");
 
         assertNotNull(items);
         assertEquals(0, items.size());
@@ -160,34 +148,34 @@ public class ItemServiceTests {
     void getItemById() {
         userService.addUser(user1);
         itemService.addItem(1L, item1);
-        Item itemExp = new Item(1L, "Item 1", "Test", true, user1, null);
 
-        Item item = itemService.getItemById(1L);
+        ItemDto item = itemService.getItemById(1L, 1L);
 
         assertNotNull(item);
-        assertEquals(itemExp, item);
+        assertEquals(1L, item.getId());
     }
 
     @Test
     void getItemByIdNoSuchItem() {
-        assertThrows(ItemNotFoundException.class, () -> itemService.getItemById(1L));
+        userService.addUser(user1);
+
+        assertThrows(EntityNotFoundException.class, () -> itemService.getItemById(1L, 1L));
     }
 
     @Test
     void addItem() {
         userService.addUser(user1);
-        Item itemExp = new Item(1L, "Item 1", "Test", true, user1, null);
 
-        Item item = itemService.addItem(1L, item1);
+        ItemDto item = itemService.addItem(1L, item1);
 
         assertNotNull(item);
-        assertEquals(itemExp, item);
+        assertEquals(1L, item.getId());
     }
 
     @Test
     void addItemNoName() {
         userService.addUser(user1);
-        Item item = new Item(1L, null, "Test", true, user1, null);
+        ItemDto item = new ItemDto(null, null, "Test", true, null, null, null, null);
 
         assertThrows(ConstraintViolationException.class, () -> itemService.addItem(1L, item));
     }
@@ -195,7 +183,7 @@ public class ItemServiceTests {
     @Test
     void addItemNoDescription() {
         userService.addUser(user1);
-        Item item = new Item(1L, "Item 1", null, true, user1, null);
+        ItemDto item = new ItemDto(null, "Item 1", null, true, null, null, null, null);
 
         assertThrows(ConstraintViolationException.class, () -> itemService.addItem(1L, item));
     }
@@ -203,88 +191,93 @@ public class ItemServiceTests {
     @Test
     void addItemNoAvailable() {
         userService.addUser(user1);
-        Item item = new Item(1L, "Item 1", "Test", null, user1, null);
+        ItemDto item = new ItemDto(null, "Item 1", "Test", null, null, null, null, null);
 
         assertThrows(ConstraintViolationException.class, () -> itemService.addItem(1L, item));
     }
 
     @Test
     void addItemNoSuchUser() {
-        assertThrows(UserNotFoundException.class, () -> itemService.addItem(1L, item1));
+        assertThrows(EntityNotFoundException.class, () -> itemService.addItem(1L, item1));
     }
 
     @Test
     void updateItem() {
         userService.addUser(user1);
         itemService.addItem(1L, item1);
-        Item itemUpd = new Item(null, "UPD", "UPD", false, null, null);
-        Item itemExp = new Item(1L, "UPD", "UPD", false, user1, null);
+        ItemDto itemUpd = new ItemDto(null, "NAME", "DESC", false, null, null, null, null);
 
-        Item item = itemService.updateItem(1L, 1L, itemUpd);
+        ItemDto item = itemService.updateItem(1L, 1L, itemUpd);
 
         assertNotNull(item);
-        assertEquals(itemExp, item);
+        assertEquals("NAME", item.getName());
+        assertEquals("DESC", item.getDescription());
+        assertEquals(false, item.getAvailable());
     }
 
     @Test
     void updateName() {
         userService.addUser(user1);
         itemService.addItem(1L, item1);
-        Item itemUpd = new Item(null, "UPD", null, null, null, null);
-        Item itemExp = new Item(1L, "UPD", "Test", true, user1, null);
+        ItemDto itemUpd = new ItemDto(null, "NAME", null, null, null, null, null, null);
 
-        Item item = itemService.updateItem(1L, 1L, itemUpd);
+        ItemDto item = itemService.updateItem(1L, 1L, itemUpd);
 
         assertNotNull(item);
-        assertEquals(itemExp, item);
+        assertEquals("NAME", item.getName());
+        assertEquals("Test", item.getDescription());
+        assertEquals(true, item.getAvailable());
     }
 
     @Test
     void updateDescription() {
         userService.addUser(user1);
         itemService.addItem(1L, item1);
-        Item itemUpd = new Item(null, null, "UPD", null, null, null);
-        Item itemExp = new Item(1L, "Item 1", "UPD", true, user1, null);
+        ItemDto itemUpd = new ItemDto(null, null, "DESC", null, null, null, null, null);
 
-        Item item = itemService.updateItem(1L, 1L, itemUpd);
+        ItemDto item = itemService.updateItem(1L, 1L, itemUpd);
 
         assertNotNull(item);
-        assertEquals(itemExp, item);
+        assertEquals("Item 1", item.getName());
+        assertEquals("DESC", item.getDescription());
+        assertEquals(true, item.getAvailable());
     }
 
     @Test
     void updateAvailable() {
         userService.addUser(user1);
         itemService.addItem(1L, item1);
-        Item itemUpd = new Item(null, null, null, false, null, null);
-        Item itemExp = new Item(1L, "Item 1", "Test", false, user1, null);
+        ItemDto itemUpd = new ItemDto(null, null, null, false, null, null, null, null);
 
-        Item item = itemService.updateItem(1L, 1L, itemUpd);
+        ItemDto item = itemService.updateItem(1L, 1L, itemUpd);
 
         assertNotNull(item);
-        assertEquals(itemExp, item);
+        assertEquals("Item 1", item.getName());
+        assertEquals("Test", item.getDescription());
+        assertEquals(false, item.getAvailable());
     }
 
     @Test
     void updateItemBlankNameAndDescription() {
         userService.addUser(user1);
         itemService.addItem(1L, item1);
-        Item itemUpd = new Item(null, "   ", "  ", false, null, null);
-        Item itemExp = new Item(1L, "Item 1", "Test", false, user1, null);
+        ItemDto itemUpd = new ItemDto(null, "   ", "   ", false, null, null, null, null);
 
-        Item item = itemService.updateItem(1L, 1L, itemUpd);
+        ItemDto item = itemService.updateItem(1L, 1L, itemUpd);
 
         assertNotNull(item);
-        assertEquals(itemExp, item);
+        assertEquals("Item 1", item.getName());
+        assertEquals("Test", item.getDescription());
+        assertEquals(false, item.getAvailable());
     }
 
     @Test
     void updateItemIncorrectId() {
         userService.addUser(user1);
         itemService.addItem(1L, item1);
-        Item itemUpd = new Item(null, "UPD", "UPD", false, null, null);
+        ItemDto itemUpd = new ItemDto(null, "UPD", "UPD", false, null, null, null, null);
 
-        assertThrows(ItemNotFoundException.class, () -> itemService.updateItem(1L, 2L, itemUpd));
+        assertThrows(EntityNotFoundException.class, () -> itemService.updateItem(1L, 2L, itemUpd));
     }
 
     @Test
@@ -292,7 +285,7 @@ public class ItemServiceTests {
         userService.addUser(user1);
         userService.addUser(user2);
         itemService.addItem(1L, item1);
-        Item itemUpd = new Item(null, "UPD", "UPD", false, null, null);
+        ItemDto itemUpd = new ItemDto(null, "UPD", "UPD", false, null, null, null, null);
 
         assertThrows(AccessDeniedException.class, () -> itemService.updateItem(2L, 1L, itemUpd));
     }
@@ -304,7 +297,7 @@ public class ItemServiceTests {
 
         itemService.deleteItemById(1L, 1L);
 
-        assertThrows(ItemNotFoundException.class, () -> itemService.getItemById(1L));
+        assertThrows(EntityNotFoundException.class, () -> itemService.getItemById(1L, 1L));
     }
 
     @Test

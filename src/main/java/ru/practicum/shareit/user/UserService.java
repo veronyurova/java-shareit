@@ -4,15 +4,13 @@ import javax.validation.Valid;
 import java.util.List;
 
 public interface UserService {
-    List<User> getAllUsers();
+    List<UserDto> getAllUsers();
 
-    User getUserById(Long id);
+    UserDto getUserById(Long userId);
 
-    User addUser(@Valid User user);
+    UserDto addUser(@Valid UserDto userDto);
 
-    User updateUser(Long id, User newUser);
+    UserDto updateUser(Long userId, UserDto userDto);
 
-    void deleteUserById(Long id);
-
-    void deleteAllUsers();
+    void deleteUserById(Long userId);
 }

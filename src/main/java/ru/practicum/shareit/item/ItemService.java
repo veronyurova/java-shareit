@@ -4,15 +4,21 @@ import javax.validation.Valid;
 import java.util.List;
 
 public interface ItemService {
-    List<Item> getOwnerItems(Long userId);
+    List<ItemDto> getOwnerItems(Long userId);
 
-    List<Item> searchItems(String text);
+    List<ItemDto> searchItems(String text);
 
-    Item getItemById(Long id);
+    ItemDto getItemById(Long userId, Long itemId);
 
-    Item addItem(Long userId, @Valid Item item);
+    ItemDto addItem(Long userId, @Valid ItemDto itemDto);
 
-    Item updateItem(Long userId, Long id, Item newItem);
+    ItemDto updateItem(Long userId, Long itemId, ItemDto itemDto);
 
     void deleteItemById(Long userId, Long id);
+
+    CommentDto addComment(Long userId, Long itemId, @Valid CommentDto commentDto);
+
+    void addLastAndNextBooking(ItemDto itemDto);
+
+    void addCommentsList(ItemDto itemDto);
 }

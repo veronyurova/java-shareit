@@ -10,6 +10,8 @@ import org.springframework.validation.FieldError;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
+import javax.persistence.EntityNotFoundException;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -57,17 +59,17 @@ public class CustomExceptionHandler {
     }
 
     @ExceptionHandler
-    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ResponseBody
-    public ErrorResponse handleUserNotFoundException(UserNotFoundException e) {
-        return new ErrorResponse("UserNotFound", e.getMessage());
+    public ErrorResponse handleSQLException(SQLException e) {
+        return new ErrorResponse("SQLException", e.getMessage());
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ResponseBody
-    public ErrorResponse handleItemNotFoundException(ItemNotFoundException e) {
-        return new ErrorResponse("ItemNotFound", e.getMessage());
+    public ErrorResponse handleEntityNotFoundException(EntityNotFoundException e) {
+        return new ErrorResponse("EntityNotFound", e.getMessage());
     }
 
     @ExceptionHandler
@@ -75,13 +77,6 @@ public class CustomExceptionHandler {
     @ResponseBody
     public ErrorResponse handleAccessDeniedException(AccessDeniedException e) {
         return new ErrorResponse("AccessDenied", e.getMessage());
-    }
-
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.CONFLICT)
-    @ResponseBody
-    public ErrorResponse handleEmailAlreadyTakenException(EmailAlreadyTakenException e) {
-        return new ErrorResponse("EmailAlreadyTaken", e.getMessage());
     }
 
     @Getter

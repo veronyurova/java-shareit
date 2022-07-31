@@ -1,21 +1,18 @@
-package ru.practicum.shareit.user;
+package ru.practicum.shareit.item;
 
 import lombok.Getter;
 import lombok.AllArgsConstructor;
-
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Email;
+import java.time.LocalDateTime;
 
 @Getter
 @AllArgsConstructor
-public class UserDto {
+public class CommentDto {
     private Long id;
     @NotNull
     @NotBlank
-    private String name;
-    @NotNull
-    @NotBlank
-    @Email
-    private String email;
+    private String text;
+    private String authorName;
+    private LocalDateTime created;
 }

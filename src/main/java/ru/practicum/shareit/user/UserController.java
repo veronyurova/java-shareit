@@ -3,9 +3,7 @@ package ru.practicum.shareit.user;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import javax.validation.Valid;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping(path = "/users")
@@ -19,32 +17,27 @@ public class UserController {
 
     @GetMapping
     public List<UserDto> getAllUsers() {
-        return userService.getAllUsers()
-                .stream()
-                .map(UserMapper::toUserDto)
-                .collect(Collectors.toList());
+        return userService.getAllUsers();
     }
 
     @GetMapping("/{id}")
     public UserDto getUserById(@PathVariable Long id) {
-        return UserMapper.toUserDto(userService.getUserById(id));
+        return userService.getUserById(id);
     }
 
     @PostMapping
-    public UserDto addUser(@Valid @RequestBody UserDto userDto) {
-        User user = UserMapper.toUser(userDto);
-        return UserMapper.toUserDto(userService.addUser(user));
+    public UserDto addUser(@RequestBody UserDto userDto) {
+        return userService.addUser(userDto);
     }
 
-    @PatchMapping("/{id}")
-    public UserDto updateUser(@PathVariable Long id,
-                              @Valid @RequestBody UserDto userDto) {
-        User newUser = UserMapper.toUser(userDto);
-        return UserMapper.toUserDto(userService.updateUser(id, newUser));
+    @PatchMapping("/{userId}")
+    public UserDto updateUser(@PathVariable Long userId,
+                              @RequestBody UserDto userDto) {
+        return userService.updateUser(userId, userDto);
     }
 
-    @DeleteMapping("/{id}")
-    public void deleteUserById(@PathVariable Long id) {
-        userService.deleteUserById(id);
+    @DeleteMapping("/{userId}")
+    public void deleteUserById(@PathVariable Long userId) {
+        userService.deleteUserById(userId);
     }
 }
