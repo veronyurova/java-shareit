@@ -21,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class BookingServiceTests {
-    private final BookingService bookingService;
+    /*private final BookingService bookingService;
     private final UserService userService;
     private final ItemService itemService;
     private final BookingDtoAdd booking1 = new BookingDtoAdd(null,
@@ -399,5 +399,5 @@ public class BookingServiceTests {
 
         assertThrows(EntityNotFoundException.class,
                 () -> bookingService.updateBookingStatus(1L, 1L, true));
-    }
+    }*/
 }

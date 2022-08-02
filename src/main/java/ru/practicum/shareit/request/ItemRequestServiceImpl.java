@@ -3,12 +3,15 @@ package ru.practicum.shareit.request;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageRequest;
 import ru.practicum.shareit.item.ItemService;
 import ru.practicum.shareit.user.UserMapper;
 import ru.practicum.shareit.user.UserService;
 
 import javax.persistence.EntityNotFoundException;
 import javax.validation.Valid;
+import javax.validation.constraints.Min;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -30,15 +33,23 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     }
 
     @Override
-    public List<ItemRequestDto> getAllRequests(int from, int size) {
-        return itemRequestRepository.findAll()
+    public List<ItemRequestDto> getAllRequests(Long userId, @Min(0) int from, @Min(1) int size) {
+        userService.getUserById(userId);
+        Pageable pageable = PageRequest.of(from / size, size);
+        List<ItemRequestDto> requests = itemRequestRepository.findAll(userId, pageable)
                 .stream()
                 .map(ItemRequestMapper::toItemRequestDto)
                 .collect(Collectors.toList());
+        requests.forEach(request -> request.setItems(
+                        itemService.getItemsByRequestId(request.getId())
+                )
+        );
+        return requests;
     }
 
     @Override
     public List<ItemRequestDto> getUserRequests(Long userId) {
+        userService.getUserById(userId);
         List<ItemRequestDto> requests = itemRequestRepository.findByRequesterId(userId)
                 .stream()
                 .map(ItemRequestMapper::toItemRequestDto)
@@ -52,6 +63,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
 
     @Override
     public ItemRequestDto getRequestById(Long userId, Long requestId) {
+        userService.getUserById(userId);
         Optional<ItemRequest> itemRequest = itemRequestRepository.findById(requestId);
         if (itemRequest.isEmpty()) {
             String message = String.format("There is no request with id %d", requestId);

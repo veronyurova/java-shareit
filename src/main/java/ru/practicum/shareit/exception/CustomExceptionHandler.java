@@ -82,7 +82,7 @@ public class CustomExceptionHandler {
     @Getter
     @AllArgsConstructor
     class ErrorResponse {
+        private String exception;
         private String error;
-        private String description;
     }
 }

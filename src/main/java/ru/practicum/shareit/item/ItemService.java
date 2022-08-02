@@ -1,12 +1,13 @@
 package ru.practicum.shareit.item;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Min;
 import java.util.List;
 
 public interface ItemService {
-    List<ItemDto> getOwnerItems(Long userId);
+    List<ItemDto> getOwnerItems(Long userId, @Min(0) int from, @Min(1) int size);
 
-    List<ItemDto> searchItems(String text);
+    List<ItemDto> searchItems(String text, @Min(0) int from, @Min(1) int size);
 
     ItemDto getItemById(Long userId, Long itemId);
 

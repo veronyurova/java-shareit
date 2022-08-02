@@ -1,10 +1,11 @@
 package ru.practicum.shareit.request;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Min;
 import java.util.List;
 
 public interface ItemRequestService {
-    List<ItemRequestDto> getAllRequests(int from, int size);
+    List<ItemRequestDto> getAllRequests(Long userId, @Min(0) int from, @Min(1) int size);
 
     List<ItemRequestDto> getUserRequests(Long userId);
 
