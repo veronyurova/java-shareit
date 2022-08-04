@@ -1,6 +1,7 @@
 package ru.practicum.shareit.request;
 
 import lombok.Getter;
+import lombok.EqualsAndHashCode;
 import lombok.AllArgsConstructor;
 import ru.practicum.shareit.item.ItemDto;
 
@@ -10,6 +11,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
+@EqualsAndHashCode
 @AllArgsConstructor
 public class ItemRequestDto {
     private Long id;
@@ -25,6 +27,7 @@ public class ItemRequestDto {
     }
 
     @Getter
+    @EqualsAndHashCode
     @AllArgsConstructor
     static class UserDto {
         private Long id;
