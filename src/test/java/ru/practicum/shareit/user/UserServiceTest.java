@@ -29,7 +29,6 @@ public class UserServiceTest {
     private final UserDto userDtoSave = new UserDto(null, "User", "user@mail.com");
     private final UserDto userExpected = new UserDto(1L, "User", "user@mail.com");
 
-
     @BeforeEach
     void beforeEach() {
         userService = new UserServiceImpl(mockUserRepository);
@@ -58,9 +57,7 @@ public class UserServiceTest {
 
     @Test
     void getUserById() {
-        Mockito
-                .when(mockUserRepository.findById(Mockito.anyLong()))
-                .thenReturn(Optional.of(userGet));
+        Mockito.when(mockUserRepository.findById(1L)).thenReturn(Optional.of(userGet));
 
         UserDto user = userService.getUserById(1L);
 
@@ -70,9 +67,7 @@ public class UserServiceTest {
 
     @Test
     void getUserByIdNoSuchUser() {
-        Mockito
-                .when(mockUserRepository.findById(Mockito.anyLong()))
-                .thenReturn(Optional.empty());
+        Mockito.when(mockUserRepository.findById(1L)).thenReturn(Optional.empty());
 
         assertThrows(EntityNotFoundException.class, () -> userService.getUserById(1L));
     }

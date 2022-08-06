@@ -104,8 +104,6 @@ public class BookingServiceIntegrationTest {
 
     @Test
     void updateBookingStatus() {
-        BookingDtoAdd bookingDtoAdd = new BookingDtoAdd(null, LocalDateTime.now().plusDays(1L),
-                LocalDateTime.now().plusDays(2L));
         manager.persist(userAdd1);
         manager.persist(userAdd2);
         manager.persist(itemAdd1);
