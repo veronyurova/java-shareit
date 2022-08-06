@@ -41,7 +41,7 @@ public class ItemRequestServiceIntegrationTest {
         manager.persist(itemRequestAdd2);
         manager.persist(itemRequestAdd3);
 
-        List<ItemRequestDto> requests = itemRequestService.getAllRequests(2L, 0 ,10);
+        List<ItemRequestDto> requests = itemRequestService.getAllRequests(2L, 0 , 10);
 
         assertNotNull(requests);
         assertEquals(2, requests.size());

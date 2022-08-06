@@ -83,7 +83,7 @@ public class ItemServiceTest {
                 .when(mockItemRepository.findByOwnerId(1L, PageRequest.of(0, 10)))
                 .thenReturn(Collections.emptyList());
 
-        List<ItemDto> items = itemService.getOwnerItems(1L, 0 , 10);
+        List<ItemDto> items = itemService.getOwnerItems(1L, 0, 10);
 
         assertNotNull(items);
         assertEquals(0, items.size());
