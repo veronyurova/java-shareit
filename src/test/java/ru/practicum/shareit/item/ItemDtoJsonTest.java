@@ -5,6 +5,9 @@ import org.springframework.boot.test.autoconfigure.json.JsonTest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.boot.test.json.JsonContent;
+import ru.practicum.shareit.booking.Booking;
+import ru.practicum.shareit.booking.BookingStatus;
+import ru.practicum.shareit.user.User;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -41,7 +44,8 @@ public class ItemDtoJsonTest {
     void testItemDtoWithComments() throws IOException {
         CommentDto commentDto = new CommentDto(1L, "Comment", "User", LocalDateTime.MIN);
         ItemDto itemDto = new ItemDto(1L, "Item 1", "Test", true,
-                new ItemDto.UserDto(1L, "User"), 1L, null, null, List.of(commentDto));
+                new ItemDto.UserDto(1L, "User"), 1L, null, null, null);
+        itemDto.setComments(List.of(commentDto));
 
         JsonContent<ItemDto> result = json.write(itemDto);
 
@@ -66,7 +70,8 @@ public class ItemDtoJsonTest {
     @Test
     void testItemDtoWithCommentsEmpty() throws IOException {
         ItemDto itemDto = new ItemDto(1L, "Item 1", "Test", true,
-                new ItemDto.UserDto(1L, "User"), 1L, null, null, Collections.emptyList());
+                new ItemDto.UserDto(1L, "User"), 1L, null, null, null);
+        itemDto.setComments(Collections.emptyList());
 
         JsonContent<ItemDto> result = json.write(itemDto);
 
@@ -85,12 +90,16 @@ public class ItemDtoJsonTest {
 
     @Test
     void testItemDtoWithBookings() throws IOException {
-        ItemDto.BookingDto lastBooking = new ItemDto.BookingDto(1L, 1L, LocalDateTime.MIN,
-                LocalDateTime.MIN);
-        ItemDto.BookingDto nextBooking = new ItemDto.BookingDto(2L, 1L, LocalDateTime.MAX,
-                LocalDateTime.MAX);
+        User user = new User(1L, "User", "user@mail.com");
+        Item item = new Item(1L, "Item 1", "Test", true, user, null);
+        Booking lastBooking = new Booking(1L, LocalDateTime.MIN, LocalDateTime.MIN,
+                item, user, BookingStatus.APPROVED);
+        Booking nextBooking = new Booking(2L, LocalDateTime.MAX, LocalDateTime.MAX,
+                item, user, BookingStatus.APPROVED);
         ItemDto itemDto = new ItemDto(1L, "Item 1", "Test", true,
-                new ItemDto.UserDto(1L, "User"), 1L, lastBooking, nextBooking, null);
+                new ItemDto.UserDto(1L, "User"), 1L, null, null, null);
+        itemDto.setLastBooking(lastBooking);
+        itemDto.setNextBooking(nextBooking);
 
         JsonContent<ItemDto> result = json.write(itemDto);
 

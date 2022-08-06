@@ -40,7 +40,8 @@ public class ItemRequestDtoJsonTest {
         ItemDto itemDto = new ItemDto(1L, "Item 1", "Test", true,
                 new ItemDto.UserDto(1L, "User"), 1L, null, null, null);
         ItemRequestDto itemRequestDto = new ItemRequestDto(1L, "Request",
-                new ItemRequestDto.UserDto(1L, "User"), LocalDateTime.MIN, List.of(itemDto));
+                new ItemRequestDto.UserDto(1L, "User"), LocalDateTime.MIN, null);
+        itemRequestDto.setItems(List.of(itemDto));
 
         JsonContent<ItemRequestDto> result = json.write(itemRequestDto);
 
@@ -67,8 +68,8 @@ public class ItemRequestDtoJsonTest {
     @Test
     void testItemRequestDtoWithItemsEmpty() throws IOException {
         ItemRequestDto itemRequestDto = new ItemRequestDto(1L, "Request",
-                new ItemRequestDto.UserDto(1L, "User"), LocalDateTime.MIN,
-                Collections.emptyList());
+                new ItemRequestDto.UserDto(1L, "User"), LocalDateTime.MIN, null);
+        itemRequestDto.setItems(Collections.emptyList());
 
         JsonContent<ItemRequestDto> result = json.write(itemRequestDto);
 
