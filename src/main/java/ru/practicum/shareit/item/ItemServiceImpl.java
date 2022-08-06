@@ -92,7 +92,7 @@ public class ItemServiceImpl implements ItemService {
         Long requestId = itemDto.getRequestId();
         if (requestId != null) {
             Optional<ItemRequest> request = itemRequestRepository.findById(requestId);
-            if (request.isPresent()) item.setRequest(request.get());
+            request.ifPresent(item::setRequest);
         }
         Item addedItem = itemRepository.save(item);
         log.info("ItemServiceImpl.addItem: item {} successfully added", addedItem.getId());
@@ -162,10 +162,10 @@ public class ItemServiceImpl implements ItemService {
     public void addLastAndNextBooking(ItemDto itemDto) {
         Optional<Booking> lastBooking = bookingRepository.findLastBookings(itemDto.getId(),
                 LocalDateTime.now()).stream().findFirst();
-        if (lastBooking.isPresent()) itemDto.setLastBooking(lastBooking.get());
+        lastBooking.ifPresent(itemDto::setLastBooking);
         Optional<Booking> nextBooking = bookingRepository.findNextBookings(itemDto.getId(),
                 LocalDateTime.now()).stream().findFirst();
-        if (nextBooking.isPresent()) itemDto.setNextBooking(nextBooking.get());
+        nextBooking.ifPresent(itemDto::setNextBooking);
     }
 
     @Override
