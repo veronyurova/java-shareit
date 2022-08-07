@@ -8,6 +8,7 @@ public class ItemMapper {
                 item.getDescription(),
                 item.getAvailable(),
                 new ItemDto.UserDto(item.getOwner().getId(), item.getOwner().getName()),
+                item.getRequest() != null ? item.getRequest().getId() : null,
                 null,
                 null,
                 null

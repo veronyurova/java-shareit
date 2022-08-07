@@ -4,15 +4,18 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.beans.factory.annotation.Autowired;
-import ru.practicum.shareit.exception.ValidationException;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageRequest;
 import ru.practicum.shareit.item.ItemDto;
 import ru.practicum.shareit.item.ItemMapper;
 import ru.practicum.shareit.item.ItemService;
 import ru.practicum.shareit.user.UserMapper;
 import ru.practicum.shareit.user.UserService;
+import ru.practicum.shareit.exception.ValidationException;
 
-import javax.persistence.EntityNotFoundException;
 import javax.validation.Valid;
+import javax.validation.constraints.Min;
+import javax.persistence.EntityNotFoundException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.ArrayList;
@@ -36,36 +39,42 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingDto> getRequesterBookings(Long userId, String state) {
+    public List<BookingDto> getRequesterBookings(Long userId, String state,
+                                                 @Min(0) int from, @Min(1) int size) {
         BookingState bookingState;
         try {
             bookingState = BookingState.valueOf(state);
         } catch (IllegalArgumentException e) {
-            String message = String.format("Incorrect selection criteria %s", state);
+            String message = String.format("Unknown state: %s", state);
             log.warn("ValidationException at BookingService.getRequesterBookings: {}", message);
             throw new ValidationException(message);
         }
+        userService.getUserById(userId);
         List<Booking> bookings = new ArrayList<>();
+        Pageable pageable = PageRequest.of(from / size, size);
         switch (bookingState) {
             case ALL:
-                bookings = bookingRepository.findAllByBookerId(userId);
+                bookings = bookingRepository.findAllByBookerId(userId, pageable);
                 break;
             case PAST:
-                bookings = bookingRepository.findPastByBookerId(userId, LocalDateTime.now());
+                bookings = bookingRepository.findPastByBookerId(userId, LocalDateTime.now(),
+                        pageable);
                 break;
             case FUTURE:
-                bookings = bookingRepository.findFutureByBookerId(userId, LocalDateTime.now());
+                bookings = bookingRepository.findFutureByBookerId(userId, LocalDateTime.now(),
+                        pageable);
                 break;
             case CURRENT:
-                bookings = bookingRepository.findCurrentByBookerId(userId, LocalDateTime.now());
+                bookings = bookingRepository.findCurrentByBookerId(userId, LocalDateTime.now(),
+                        pageable);
                 break;
             case WAITING:
                 bookings = bookingRepository.findByBookerIdAndStatus(userId,
-                        BookingStatus.WAITING);
+                        BookingStatus.WAITING, pageable);
                 break;
             case REJECTED:
                 bookings = bookingRepository.findByBookerIdAndStatus(userId,
-                        BookingStatus.REJECTED);
+                        BookingStatus.REJECTED, pageable);
                 break;
         }
         return bookings.stream()
@@ -74,36 +83,42 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingDto> getOwnerBookings(Long userId, String state) {
+    public List<BookingDto> getOwnerBookings(Long userId, String state,
+                                             @Min(0) int from, @Min(1) int size) {
         BookingState bookingState;
         try {
             bookingState = BookingState.valueOf(state);
         } catch (IllegalArgumentException e) {
-            String message = String.format("Incorrect selection criteria %s", state);
+            String message = String.format("Unknown state: %s", state);
             log.warn("ValidationException at BookingService.getOwnerBookings: {}", message);
             throw new ValidationException(message);
         }
+        userService.getUserById(userId);
         List<Booking> bookings = new ArrayList<>();
+        Pageable pageable = PageRequest.of(from / size, size);
         switch (bookingState) {
             case ALL:
-                bookings = bookingRepository.findAllByOwnerId(userId);
+                bookings = bookingRepository.findAllByOwnerId(userId, pageable);
                 break;
             case PAST:
-                bookings = bookingRepository.findPastByOwnerId(userId, LocalDateTime.now());
+                bookings = bookingRepository.findPastByOwnerId(userId, LocalDateTime.now(),
+                        pageable);
                 break;
             case FUTURE:
-                bookings = bookingRepository.findFutureByOwnerId(userId, LocalDateTime.now());
+                bookings = bookingRepository.findFutureByOwnerId(userId, LocalDateTime.now(),
+                        pageable);
                 break;
             case CURRENT:
-                bookings = bookingRepository.findCurrentByOwnerId(userId, LocalDateTime.now());
+                bookings = bookingRepository.findCurrentByOwnerId(userId, LocalDateTime.now(),
+                        pageable);
                 break;
             case WAITING:
                 bookings = bookingRepository.findByOwnerIdAndStatus(userId,
-                        BookingStatus.WAITING);
+                        BookingStatus.WAITING, pageable);
                 break;
             case REJECTED:
                 bookings = bookingRepository.findByOwnerIdAndStatus(userId,
-                        BookingStatus.REJECTED);
+                        BookingStatus.REJECTED, pageable);
                 break;
         }
         return bookings.stream()
@@ -113,6 +128,7 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public BookingDto getBookingById(Long userId, Long bookingId) {
+        userService.getUserById(userId);
         Optional<Booking> bookingOptional = bookingRepository.findById(bookingId);
         if (bookingOptional.isEmpty()) {
             String message = String.format("There is no booking with id %d", bookingId);

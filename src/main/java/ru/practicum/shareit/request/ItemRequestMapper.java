@@ -5,9 +5,10 @@ public class ItemRequestMapper {
         return new ItemRequestDto(
                 itemRequest.getId(),
                 itemRequest.getDescription(),
-                new ItemRequestDto.User(itemRequest.getRequester().getId(),
-                                        itemRequest.getRequester().getName()),
-                itemRequest.getCreated()
+                new ItemRequestDto.UserDto(itemRequest.getRequester().getId(),
+                                           itemRequest.getRequester().getName()),
+                itemRequest.getCreated(),
+                null
         );
     }
 
@@ -16,7 +17,7 @@ public class ItemRequestMapper {
                 null,
                 itemRequestDto.getDescription(),
                 null,
-                itemRequestDto.getCreated()
+                null
         );
     }
 }
