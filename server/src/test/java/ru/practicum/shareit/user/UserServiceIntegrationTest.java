@@ -2,14 +2,14 @@ package ru.practicum.shareit.user;
 
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Test;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
-import javax.persistence.TypedQuery;
 import javax.persistence.NoResultException;
+import javax.persistence.TypedQuery;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;

@@ -1,28 +1,28 @@
 package ru.practicum.shareit.item;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.PageRequest;
-import ru.practicum.shareit.user.UserService;
-import ru.practicum.shareit.user.UserMapper;
 import ru.practicum.shareit.booking.Booking;
-import ru.practicum.shareit.booking.BookingStatus;
 import ru.practicum.shareit.booking.BookingRepository;
+import ru.practicum.shareit.booking.BookingStatus;
+import ru.practicum.shareit.exception.AccessDeniedException;
+import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.request.ItemRequest;
 import ru.practicum.shareit.request.ItemRequestRepository;
-import ru.practicum.shareit.exception.ValidationException;
-import ru.practicum.shareit.exception.AccessDeniedException;
+import ru.practicum.shareit.user.UserMapper;
+import ru.practicum.shareit.user.UserService;
 
+import javax.persistence.EntityNotFoundException;
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
-import javax.persistence.EntityNotFoundException;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.Collections;
 import java.util.stream.Collectors;
 
 @Slf4j

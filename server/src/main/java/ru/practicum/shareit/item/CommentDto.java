@@ -1,10 +1,11 @@
 package ru.practicum.shareit.item;
 
-import lombok.Getter;
-import lombok.EqualsAndHashCode;
 import lombok.AllArgsConstructor;
-import javax.validation.constraints.NotNull;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 @Getter

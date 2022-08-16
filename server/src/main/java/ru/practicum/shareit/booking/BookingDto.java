@@ -1,8 +1,8 @@
 package ru.practicum.shareit.booking;
 
-import lombok.Getter;
-import lombok.EqualsAndHashCode;
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 
 import java.time.LocalDateTime;
 

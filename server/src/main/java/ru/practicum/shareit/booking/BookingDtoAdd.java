@@ -1,12 +1,12 @@
 package ru.practicum.shareit.booking;
 
-import lombok.Getter;
-import lombok.EqualsAndHashCode;
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.FutureOrPresent;
 import javax.validation.constraints.Future;
+import javax.validation.constraints.FutureOrPresent;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 @Getter

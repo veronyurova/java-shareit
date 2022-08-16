@@ -2,17 +2,17 @@ package ru.practicum.shareit.item;
 
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Test;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
-import ru.practicum.shareit.user.User;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.Booking;
 import ru.practicum.shareit.booking.BookingStatus;
+import ru.practicum.shareit.user.User;
 
 import javax.persistence.EntityManager;
-import javax.persistence.TypedQuery;
 import javax.persistence.NoResultException;
+import javax.persistence.TypedQuery;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
