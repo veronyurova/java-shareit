@@ -1,24 +1,22 @@
 package ru.practicum.shareit.item;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
-import ru.practicum.shareit.booking.Booking;
-import ru.practicum.shareit.booking.BookingRepository;
-import ru.practicum.shareit.booking.BookingStatus;
-import ru.practicum.shareit.exception.AccessDeniedException;
-import ru.practicum.shareit.exception.ValidationException;
-import ru.practicum.shareit.request.ItemRequest;
-import ru.practicum.shareit.request.ItemRequestRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageRequest;
 import ru.practicum.shareit.user.UserMapper;
 import ru.practicum.shareit.user.UserService;
+import ru.practicum.shareit.booking.Booking;
+import ru.practicum.shareit.booking.BookingStatus;
+import ru.practicum.shareit.booking.BookingRepository;
+import ru.practicum.shareit.request.ItemRequest;
+import ru.practicum.shareit.request.ItemRequestRepository;
+import ru.practicum.shareit.exception.ValidationException;
+import ru.practicum.shareit.exception.AccessDeniedException;
 
 import javax.persistence.EntityNotFoundException;
-import javax.validation.Valid;
-import javax.validation.constraints.Min;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
@@ -48,7 +46,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemDto> getOwnerItems(Long userId, @Min(0) int from, @Min(1) int size) {
+    public List<ItemDto> getOwnerItems(Long userId, int from, int size) {
         userService.getUserById(userId);
         Pageable pageable = PageRequest.of(from / size, size);
         List<ItemDto> items = itemRepository.findByOwnerId(userId, pageable)
@@ -61,7 +59,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemDto> searchItems(String text, @Min(0) int from, @Min(1) int size) {
+    public List<ItemDto> searchItems(String text, int from, int size) {
         if (text.isBlank()) return Collections.emptyList();
         Pageable pageable = PageRequest.of(from / size, size);
         return itemRepository.searchItems(text, pageable)
@@ -86,7 +84,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public ItemDto addItem(Long userId, @Valid ItemDto itemDto) {
+    public ItemDto addItem(Long userId, ItemDto itemDto) {
         Item item = ItemMapper.toItemAdd(itemDto);
         item.setOwner(UserMapper.toUser(userService.getUserById(userId)));
         Long requestId = itemDto.getRequestId();
@@ -141,7 +139,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public CommentDto addComment(Long userId, Long itemId, @Valid CommentDto commentDto) {
+    public CommentDto addComment(Long userId, Long itemId, CommentDto commentDto) {
         Comment comment = CommentMapper.toComment(commentDto);
         Booking booking = bookingRepository.findCompletedBooking(userId, itemId,
                 BookingStatus.APPROVED, LocalDateTime.now());
