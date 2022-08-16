@@ -8,7 +8,6 @@ import org.springframework.lang.Nullable;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.client.HttpStatusCodeException;
 
-
 public class BaseClient {
     protected final RestTemplate rest;
 
@@ -81,7 +80,7 @@ public class BaseClient {
         return makeAndSendRequest(HttpMethod.DELETE, path, userId, parameters, null);
     }
 
-    private <T> ResponseEntity<Object> makeAndSendRequest(HttpMethod method, String path, 
+    private <T> ResponseEntity<Object> makeAndSendRequest(HttpMethod method, String path,
                                                           Long userId,
                                                           @Nullable Map<String, Object> parameters,
                                                           @Nullable T body) {
@@ -89,7 +88,8 @@ public class BaseClient {
         HttpEntity<T> requestEntity = new HttpEntity<>(body, defaultHeaders(userId));
         try {
             if (parameters != null) {
-                serverResponse = rest.exchange(path, method, requestEntity, Object.class, parameters);
+                serverResponse = rest.exchange(path, method, requestEntity,
+                        Object.class, parameters);
             } else {
                 serverResponse = rest.exchange(path, method, requestEntity, Object.class);
             }

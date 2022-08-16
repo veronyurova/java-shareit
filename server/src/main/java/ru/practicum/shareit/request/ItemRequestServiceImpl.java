@@ -1,17 +1,16 @@
 package ru.practicum.shareit.request;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageRequest;
 import ru.practicum.shareit.item.ItemService;
-import ru.practicum.shareit.user.UserMapper;
 import ru.practicum.shareit.user.UserService;
+import ru.practicum.shareit.user.UserMapper;
 
 import javax.persistence.EntityNotFoundException;
-import javax.validation.Valid;
-import javax.validation.constraints.Min;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -25,6 +24,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     private final ItemService itemService;
     private final UserService userService;
 
+    @Autowired
     public ItemRequestServiceImpl(ItemRequestRepository itemRequestRepository,
                                   ItemService itemService, UserService userService) {
         this.itemRequestRepository = itemRequestRepository;
@@ -33,7 +33,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     }
 
     @Override
-    public List<ItemRequestDto> getAllRequests(Long userId, @Min(0) int from, @Min(1) int size) {
+    public List<ItemRequestDto> getAllRequests(Long userId, int from, int size) {
         userService.getUserById(userId);
         Pageable pageable = PageRequest.of(from / size, size);
         List<ItemRequestDto> requests = itemRequestRepository.findAll(userId, pageable)
@@ -77,7 +77,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     }
 
     @Override
-    public ItemRequestDto addRequest(Long userId, @Valid ItemRequestDto itemRequestDto) {
+    public ItemRequestDto addRequest(Long userId, ItemRequestDto itemRequestDto) {
         ItemRequest itemRequest = ItemRequestMapper.toItemRequest(itemRequestDto);
         itemRequest.setRequester(UserMapper.toUser(userService.getUserById(userId)));
         itemRequest.setCreated(LocalDateTime.now());

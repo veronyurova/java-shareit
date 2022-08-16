@@ -1,12 +1,11 @@
 package ru.practicum.shareit.item;
 
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import ru.practicum.shareit.booking.Booking;
+import lombok.EqualsAndHashCode;
+import lombok.AllArgsConstructor;
 
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -28,32 +27,6 @@ public class ItemDto {
     private BookingDto lastBooking;
     private BookingDto nextBooking;
     private List<CommentDto> comments;
-
-    public void setLastBooking(Booking booking) {
-        if (booking != null) {
-            this.lastBooking = new BookingDto(
-                    booking.getId(),
-                    booking.getBooker().getId(),
-                    booking.getStart(),
-                    booking.getEnd()
-            );
-        }
-    }
-
-    public void setNextBooking(Booking booking) {
-        if (booking != null) {
-            this.nextBooking = new BookingDto(
-                    booking.getId(),
-                    booking.getBooker().getId(),
-                    booking.getStart(),
-                    booking.getEnd()
-            );
-        }
-    }
-
-    public void setComments(List<CommentDto> comments) {
-        this.comments = comments;
-    }
 
     @Getter
     @EqualsAndHashCode

@@ -49,7 +49,8 @@ public class BookingServiceIntegrationTest {
         manager.persist(bookingAdd1);
         manager.persist(bookingAdd2);
 
-        List<BookingDto> bookings = bookingService.getRequesterBookings(2L, "ALL", 0, 10);
+        List<BookingDto> bookings = bookingService.getRequesterBookings(2L, BookingState.ALL,
+                0, 10);
 
         assertNotNull(bookings);
         assertEquals(1, bookings.size());
@@ -65,7 +66,7 @@ public class BookingServiceIntegrationTest {
         manager.persist(bookingAdd1);
         manager.persist(bookingAdd2);
 
-        List<BookingDto> bookings = bookingService.getOwnerBookings(1L, "ALL", 0, 10);
+        List<BookingDto> bookings = bookingService.getOwnerBookings(1L, BookingState.ALL, 0, 10);
 
         assertNotNull(bookings);
         assertEquals(1, bookings.size());
@@ -93,7 +94,7 @@ public class BookingServiceIntegrationTest {
         manager.persist(userAdd2);
         manager.persist(itemAdd1);
 
-        bookingService.addBooking(2L, 1L, bookingDtoAdd);
+        bookingService.addBooking(2L, bookingDtoAdd);
 
         String queryString = "SELECT b FROM Booking b WHERE b.id = 1";
         TypedQuery<Booking> query = manager.createQuery(queryString, Booking.class);

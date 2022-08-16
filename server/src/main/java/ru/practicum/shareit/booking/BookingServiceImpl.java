@@ -1,21 +1,19 @@
 package ru.practicum.shareit.booking;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
-import ru.practicum.shareit.exception.ValidationException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageRequest;
 import ru.practicum.shareit.item.ItemDto;
 import ru.practicum.shareit.item.ItemMapper;
 import ru.practicum.shareit.item.ItemService;
 import ru.practicum.shareit.user.UserMapper;
 import ru.practicum.shareit.user.UserService;
+import ru.practicum.shareit.exception.ValidationException;
 
 import javax.persistence.EntityNotFoundException;
-import javax.validation.Valid;
-import javax.validation.constraints.Min;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,20 +37,11 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingDto> getRequesterBookings(Long userId, String state,
-                                                 @Min(0) int from, @Min(1) int size) {
-        BookingState bookingState;
-        try {
-            bookingState = BookingState.valueOf(state);
-        } catch (IllegalArgumentException e) {
-            String message = String.format("Unknown state: %s", state);
-            log.warn("ValidationException at BookingService.getRequesterBookings: {}", message);
-            throw new ValidationException(message);
-        }
+    public List<BookingDto> getRequesterBookings(Long userId, BookingState state, int from, int size) {
         userService.getUserById(userId);
         List<Booking> bookings = new ArrayList<>();
         Pageable pageable = PageRequest.of(from / size, size);
-        switch (bookingState) {
+        switch (state) {
             case ALL:
                 bookings = bookingRepository.findAllByBookerId(userId, pageable);
                 break;
@@ -83,20 +72,11 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingDto> getOwnerBookings(Long userId, String state,
-                                             @Min(0) int from, @Min(1) int size) {
-        BookingState bookingState;
-        try {
-            bookingState = BookingState.valueOf(state);
-        } catch (IllegalArgumentException e) {
-            String message = String.format("Unknown state: %s", state);
-            log.warn("ValidationException at BookingService.getOwnerBookings: {}", message);
-            throw new ValidationException(message);
-        }
+    public List<BookingDto> getOwnerBookings(Long userId, BookingState state, int from, int size) {
         userService.getUserById(userId);
         List<Booking> bookings = new ArrayList<>();
         Pageable pageable = PageRequest.of(from / size, size);
-        switch (bookingState) {
+        switch (state) {
             case ALL:
                 bookings = bookingRepository.findAllByOwnerId(userId, pageable);
                 break;
@@ -147,9 +127,9 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public BookingDto addBooking(Long userId, Long itemId, @Valid BookingDtoAdd bookingDtoAdd) {
+    public BookingDto addBooking(Long userId, BookingDtoAdd bookingDtoAdd) {
         Booking booking = BookingMapper.toBookingAdd(bookingDtoAdd);
-        ItemDto itemDto = itemService.getItemById(userId, itemId);
+        ItemDto itemDto = itemService.getItemById(userId, bookingDtoAdd.getItemId());
         validateDataForAddBooking(userId, itemDto, booking);
         booking.setItem(ItemMapper.toItem(itemDto));
         booking.setBooker(UserMapper.toUser(userService.getUserById(userId)));

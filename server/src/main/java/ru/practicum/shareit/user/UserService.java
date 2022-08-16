@@ -1,6 +1,5 @@
 package ru.practicum.shareit.user;
 
-import javax.validation.Valid;
 import java.util.List;
 
 public interface UserService {
@@ -8,7 +7,7 @@ public interface UserService {
 
     UserDto getUserById(Long userId);
 
-    UserDto addUser(@Valid UserDto userDto);
+    UserDto addUser(UserDto userDto);
 
     UserDto updateUser(Long userId, UserDto userDto);
 

@@ -1,12 +1,10 @@
 package ru.practicum.shareit.item;
 
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.EqualsAndHashCode;
+import lombok.AllArgsConstructor;
 import ru.practicum.shareit.booking.Booking;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -15,13 +13,8 @@ import java.util.List;
 @AllArgsConstructor
 public class ItemDto {
     private Long id;
-    @NotNull
-    @NotBlank
     private String name;
-    @NotNull
-    @NotBlank
     private String description;
-    @NotNull
     private Boolean available;
     private UserDto owner;
     private Long requestId;

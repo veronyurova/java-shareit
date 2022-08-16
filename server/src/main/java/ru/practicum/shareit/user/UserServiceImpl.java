@@ -1,12 +1,11 @@
 package ru.practicum.shareit.user;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.persistence.EntityNotFoundException;
-import javax.validation.Valid;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -42,7 +41,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDto addUser(@Valid UserDto userDto) {
+    public UserDto addUser(UserDto userDto) {
         User user = UserMapper.toUserAdd(userDto);
         User addedUser = userRepository.save(user);
         log.info("UserServiceImpl.addUser: user {} successfully added", addedUser.getId());
@@ -58,7 +57,7 @@ public class UserServiceImpl implements UserService {
             throw new EntityNotFoundException(message);
         }
         User user = userOptional.get();
-        @Valid User newUser = UserMapper.toUserAdd(userDto);
+        User newUser = UserMapper.toUserAdd(userDto);
         if (newUser.getName() != null && !newUser.getName().isBlank()) {
             user.setName(newUser.getName());
         }
