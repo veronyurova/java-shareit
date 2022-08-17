@@ -9,7 +9,7 @@ public class UserMapper {
         return new User(userDto.getId(), userDto.getName(), userDto.getEmail());
     }
 
-    public static User toUserAdd(UserDto userDto) {
+    public static User toUserSave(UserDto userDto) {
         return new User(null, userDto.getName(), userDto.getEmail());
     }
 }

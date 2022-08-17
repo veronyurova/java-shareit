@@ -1,7 +1,7 @@
 package ru.practicum.shareit.exception;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.FieldError;
@@ -11,10 +11,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import javax.persistence.EntityNotFoundException;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -59,27 +57,6 @@ public class CustomExceptionHandler {
     @ResponseBody
     public ErrorResponse handleValidationException(ValidationException e) {
         return new ErrorResponse("ValidationException", e.getMessage());
-    }
-
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    @ResponseBody
-    public ErrorResponse handleSQLException(SQLException e) {
-        return new ErrorResponse("SQLException", e.getMessage());
-    }
-
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    @ResponseBody
-    public ErrorResponse handleEntityNotFoundException(EntityNotFoundException e) {
-        return new ErrorResponse("EntityNotFound", e.getMessage());
-    }
-
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.FORBIDDEN)
-    @ResponseBody
-    public ErrorResponse handleAccessDeniedException(AccessDeniedException e) {
-        return new ErrorResponse("AccessDenied", e.getMessage());
     }
 
     @Getter

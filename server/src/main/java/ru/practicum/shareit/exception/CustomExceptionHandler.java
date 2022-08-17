@@ -1,7 +1,7 @@
 package ru.practicum.shareit.exception;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.FieldError;
@@ -12,8 +12,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import javax.persistence.EntityNotFoundException;
-import javax.validation.ConstraintViolation;
-import javax.validation.ConstraintViolationException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,23 +31,6 @@ public class CustomExceptionHandler {
                             error.getDefaultMessage()));
             log.warn("MethodArgumentNotValidException: {}.{} {}",
                      error.getObjectName(), error.getField(), error.getDefaultMessage());
-        }
-        return errors;
-    }
-
-    @ExceptionHandler(ConstraintViolationException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ResponseBody
-    public List<ErrorResponse> handleConstraintViolationException(
-            ConstraintViolationException e) {
-        List<ErrorResponse> errors = new ArrayList<>();
-        for (ConstraintViolation<?> violation : e.getConstraintViolations()) {
-            errors.add(new ErrorResponse("ValidationException",
-                    violation.getPropertyPath().toString() + " " +
-                            violation.getMessage()));
-            log.warn("ConstraintViolationException: {} {}",
-                     violation.getPropertyPath().toString(),
-                     violation.getMessage());
         }
         return errors;
     }

@@ -14,7 +14,7 @@ public class UserClient extends BaseClient {
     private static final String API_PREFIX = "/users";
 
     @Autowired
-    public UserClient(@Value("${server.url}") String serverUrl, RestTemplateBuilder builder) {
+    public UserClient(@Value("${shareit-server.url}") String serverUrl, RestTemplateBuilder builder) {
         super(
                 builder
                         .uriTemplateHandler(new DefaultUriBuilderFactory(serverUrl + API_PREFIX))
@@ -39,7 +39,7 @@ public class UserClient extends BaseClient {
         return patch("/" + userId, userDtoUpdate);
     }
 
-    public void deleteUserById(Long userId) {
-        delete("/" + userId);
+    public ResponseEntity<Object> deleteUserById(Long userId) {
+        return delete("/" + userId, userId, null);
     }
 }

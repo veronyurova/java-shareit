@@ -42,7 +42,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto addUser(UserDto userDto) {
-        User user = UserMapper.toUserAdd(userDto);
+        User user = UserMapper.toUserSave(userDto);
         User addedUser = userRepository.save(user);
         log.info("UserServiceImpl.addUser: user {} successfully added", addedUser.getId());
         return UserMapper.toUserDto(addedUser);
@@ -57,7 +57,7 @@ public class UserServiceImpl implements UserService {
             throw new EntityNotFoundException(message);
         }
         User user = userOptional.get();
-        User newUser = UserMapper.toUserAdd(userDto);
+        User newUser = UserMapper.toUserSave(userDto);
         if (newUser.getName() != null && !newUser.getName().isBlank()) {
             user.setName(newUser.getName());
         }

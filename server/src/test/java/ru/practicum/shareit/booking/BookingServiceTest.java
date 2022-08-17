@@ -44,7 +44,7 @@ public class BookingServiceTest {
             new ItemDto.UserDto(2L, "User2"), null, null, null, null);
     private final Booking bookingGet = new Booking(1L, LocalDateTime.MIN, LocalDateTime.MAX,
             item, user, BookingStatus.WAITING);
-    private final BookingDtoAdd bookingDtoSave = new BookingDtoAdd(null, LocalDateTime.MIN,
+    private final BookingDtoAdd bookingDtoSave = new BookingDtoAdd(1L, LocalDateTime.MIN,
             LocalDateTime.MAX);
     private final BookingDto bookingExpected = new BookingDto(1L, LocalDateTime.MIN,
             LocalDateTime.MAX, new BookingDto.ItemDto(1L, "Item 1"),
@@ -366,7 +366,7 @@ public class BookingServiceTest {
 
     @Test
     void addBookingEndBeforeStart() {
-        BookingDtoAdd bookingDtoAdd = new BookingDtoAdd(null, LocalDateTime.MAX,
+        BookingDtoAdd bookingDtoAdd = new BookingDtoAdd(1L, LocalDateTime.MAX,
                 LocalDateTime.MIN);
 
         Mockito
