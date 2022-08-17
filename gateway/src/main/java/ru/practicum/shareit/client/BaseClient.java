@@ -103,20 +103,14 @@ public class BaseClient {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.setAccept(List.of(MediaType.APPLICATION_JSON));
-        if (userId != null) {
-            headers.set("X-Sharer-User-Id", String.valueOf(userId));
-        }
+        if (userId != null) headers.set("X-Sharer-User-Id", String.valueOf(userId));
         return headers;
     }
 
     private static ResponseEntity<Object> prepareGatewayResponse(ResponseEntity<Object> response) {
-        if (response.getStatusCode().is2xxSuccessful()) {
-            return response;
-        }
+        if (response.getStatusCode().is2xxSuccessful()) return response;
         ResponseEntity.BodyBuilder builder = ResponseEntity.status(response.getStatusCode());
-        if (response.hasBody()) {
-            return builder.body(response.getBody());
-        }
+        if (response.hasBody()) return builder.body(response.getBody());
         return builder.build();
     }
 }

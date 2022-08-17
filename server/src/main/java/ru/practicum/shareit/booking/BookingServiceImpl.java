@@ -37,7 +37,8 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingDto> getRequesterBookings(Long userId, BookingState state, int from, int size) {
+    public List<BookingDto> getRequesterBookings(Long userId, BookingState state,
+                                                 int from, int size) {
         userService.getUserById(userId);
         List<Booking> bookings = new ArrayList<>();
         Pageable pageable = PageRequest.of(from / size, size);
