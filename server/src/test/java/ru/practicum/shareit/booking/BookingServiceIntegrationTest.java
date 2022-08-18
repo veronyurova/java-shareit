@@ -49,8 +49,7 @@ public class BookingServiceIntegrationTest {
         manager.persist(bookingAdd1);
         manager.persist(bookingAdd2);
 
-        List<BookingDto> bookings = bookingService.getRequesterBookings(2L, BookingState.ALL,
-                0, 10);
+        List<BookingDto> bookings = bookingService.getRequesterBookings(2L, "ALL", 0, 10);
 
         assertNotNull(bookings);
         assertEquals(1, bookings.size());
@@ -66,7 +65,7 @@ public class BookingServiceIntegrationTest {
         manager.persist(bookingAdd1);
         manager.persist(bookingAdd2);
 
-        List<BookingDto> bookings = bookingService.getOwnerBookings(1L, BookingState.ALL, 0, 10);
+        List<BookingDto> bookings = bookingService.getOwnerBookings(1L, "ALL", 0, 10);
 
         assertNotNull(bookings);
         assertEquals(1, bookings.size());

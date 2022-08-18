@@ -31,7 +31,7 @@ public class BookingControllerTest {
 
     @Test
     void getRequesterBookingsDefaultState() throws Exception {
-        when(bookingService.getRequesterBookings(1L, BookingState.ALL, 1, 1))
+        when(bookingService.getRequesterBookings(1L, "ALL", 1, 1))
                 .thenReturn(List.of(bookingDto));
 
         mvc.perform(get("/bookings?from=1&size=1")
@@ -51,7 +51,7 @@ public class BookingControllerTest {
 
     @Test
     void getRequesterBookingsDefaultPaginationParameters() throws Exception {
-        when(bookingService.getRequesterBookings(1L, BookingState.ALL, 0, 10))
+        when(bookingService.getRequesterBookings(1L, "ALL", 0, 10))
                 .thenReturn(List.of(bookingDto));
 
         mvc.perform(get("/bookings?state=ALL")
@@ -71,7 +71,7 @@ public class BookingControllerTest {
 
     @Test
     void getOwnerBookings() throws Exception {
-        when(bookingService.getOwnerBookings(1L, BookingState.ALL, 1, 1))
+        when(bookingService.getOwnerBookings(1L, "ALL", 1, 1))
                 .thenReturn(List.of(bookingDto));
 
         mvc.perform(get("/bookings/owner?state=ALL&from=1&size=1")
@@ -91,7 +91,7 @@ public class BookingControllerTest {
 
     @Test
     void getOwnerBookingsDefaultState() throws Exception {
-        when(bookingService.getOwnerBookings(1L, BookingState.ALL, 1, 1))
+        when(bookingService.getOwnerBookings(1L, "ALL", 1, 1))
                 .thenReturn(List.of(bookingDto));
 
         mvc.perform(get("/bookings/owner?from=1&size=1")
@@ -111,7 +111,7 @@ public class BookingControllerTest {
 
     @Test
     void getOwnerBookingsDefaultPaginationParameters() throws Exception {
-        when(bookingService.getOwnerBookings(1L, BookingState.ALL, 0, 10))
+        when(bookingService.getOwnerBookings(1L, "ALL", 0, 10))
                 .thenReturn(List.of(bookingDto));
 
         mvc.perform(get("/bookings/owner?state=ALL")

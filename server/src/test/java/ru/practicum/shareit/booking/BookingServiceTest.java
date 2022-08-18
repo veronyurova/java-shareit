@@ -67,8 +67,7 @@ public class BookingServiceTest {
                 )
                 .thenReturn(List.of(bookingGet));
 
-        List<BookingDto> bookings = bookingService.getRequesterBookings(1L, BookingState.ALL,
-                0, 10);
+        List<BookingDto> bookings = bookingService.getRequesterBookings(1L, "ALL", 0, 10);
 
         assertNotNull(bookings);
         assertEquals(bookingExpected, bookings.get(0));
@@ -86,8 +85,7 @@ public class BookingServiceTest {
                 )
                 .thenReturn(List.of(bookingGet));
 
-        List<BookingDto> bookings = bookingService.getRequesterBookings(1L, BookingState.PAST,
-                0, 10);
+        List<BookingDto> bookings = bookingService.getRequesterBookings(1L, "PAST", 0, 10);
 
         assertNotNull(bookings);
         assertEquals(bookingExpected, bookings.get(0));
@@ -105,8 +103,7 @@ public class BookingServiceTest {
                 )
                 .thenReturn(List.of(bookingGet));
 
-        List<BookingDto> bookings = bookingService.getRequesterBookings(1L, BookingState.FUTURE,
-                0, 10);
+        List<BookingDto> bookings = bookingService.getRequesterBookings(1L, "FUTURE", 0, 10);
 
         assertNotNull(bookings);
         assertEquals(bookingExpected, bookings.get(0));
@@ -124,8 +121,7 @@ public class BookingServiceTest {
                 )
                 .thenReturn(List.of(bookingGet));
 
-        List<BookingDto> bookings = bookingService.getRequesterBookings(1L, BookingState.CURRENT,
-                0, 10);
+        List<BookingDto> bookings = bookingService.getRequesterBookings(1L, "CURRENT", 0, 10);
 
         assertNotNull(bookings);
         assertEquals(bookingExpected, bookings.get(0));
@@ -143,8 +139,7 @@ public class BookingServiceTest {
                 )
                 .thenReturn(List.of(bookingGet));
 
-        List<BookingDto> bookings = bookingService.getRequesterBookings(1L, BookingState.WAITING,
-                0, 10);
+        List<BookingDto> bookings = bookingService.getRequesterBookings(1L, "WAITING", 0, 10);
 
         assertNotNull(bookings);
         assertEquals(bookingExpected, bookings.get(0));
@@ -162,8 +157,7 @@ public class BookingServiceTest {
                 )
                 .thenReturn(List.of(bookingGet));
 
-        List<BookingDto> bookings = bookingService.getRequesterBookings(1L, BookingState.REJECTED,
-                0, 10);
+        List<BookingDto> bookings = bookingService.getRequesterBookings(1L, "REJECTED", 0, 10);
 
         assertNotNull(bookings);
         assertEquals(bookingExpected, bookings.get(0));
@@ -180,7 +174,7 @@ public class BookingServiceTest {
                 )
                 .thenReturn(List.of(bookingGet));
 
-        List<BookingDto> bookings = bookingService.getOwnerBookings(2L, BookingState.ALL, 0, 10);
+        List<BookingDto> bookings = bookingService.getOwnerBookings(2L, "ALL", 0, 10);
 
         assertNotNull(bookings);
         assertEquals(bookingExpected, bookings.get(0));
@@ -198,7 +192,7 @@ public class BookingServiceTest {
                 )
                 .thenReturn(List.of(bookingGet));
 
-        List<BookingDto> bookings = bookingService.getOwnerBookings(2L, BookingState.PAST, 0, 10);
+        List<BookingDto> bookings = bookingService.getOwnerBookings(2L, "PAST", 0, 10);
 
         assertNotNull(bookings);
         assertEquals(bookingExpected, bookings.get(0));
@@ -216,8 +210,7 @@ public class BookingServiceTest {
                 )
                 .thenReturn(List.of(bookingGet));
 
-        List<BookingDto> bookings = bookingService.getOwnerBookings(2L, BookingState.FUTURE,
-                0, 10);
+        List<BookingDto> bookings = bookingService.getOwnerBookings(2L, "FUTURE", 0, 10);
 
         assertNotNull(bookings);
         assertEquals(bookingExpected, bookings.get(0));
@@ -235,8 +228,7 @@ public class BookingServiceTest {
                 )
                 .thenReturn(List.of(bookingGet));
 
-        List<BookingDto> bookings = bookingService.getOwnerBookings(2L, BookingState.CURRENT,
-                0, 10);
+        List<BookingDto> bookings = bookingService.getOwnerBookings(2L, "CURRENT", 0, 10);
 
         assertNotNull(bookings);
         assertEquals(bookingExpected, bookings.get(0));
@@ -254,8 +246,7 @@ public class BookingServiceTest {
                 )
                 .thenReturn(List.of(bookingGet));
 
-        List<BookingDto> bookings = bookingService.getOwnerBookings(2L, BookingState.WAITING,
-                0, 10);
+        List<BookingDto> bookings = bookingService.getOwnerBookings(2L, "WAITING", 0, 10);
 
         assertNotNull(bookings);
         assertEquals(bookingExpected, bookings.get(0));
@@ -273,8 +264,7 @@ public class BookingServiceTest {
                 )
                 .thenReturn(List.of(bookingGet));
 
-        List<BookingDto> bookings = bookingService.getOwnerBookings(2L, BookingState.REJECTED,
-                0, 10);
+        List<BookingDto> bookings = bookingService.getOwnerBookings(2L, "REJECTED", 0, 10);
 
         assertNotNull(bookings);
         assertEquals(bookingExpected, bookings.get(0));
