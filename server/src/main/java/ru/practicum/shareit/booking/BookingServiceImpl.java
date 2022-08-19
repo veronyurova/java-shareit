@@ -38,14 +38,7 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public List<BookingDto> getRequesterBookings(Long userId, String state, int from, int size) {
-        BookingState bookingState;
-        try {
-            bookingState = BookingState.valueOf(state);
-        } catch (IllegalArgumentException e) {
-            String message = String.format("Unknown state: %s", state);
-            log.warn("ValidationException at BookingService.getRequesterBookings: {}", message);
-            throw new ValidationException(message);
-        }
+        BookingState bookingState = convertStringToBookingState(state);
         userService.getUserById(userId);
         List<Booking> bookings = new ArrayList<>();
         Pageable pageable = PageRequest.of(from / size, size);
@@ -81,14 +74,7 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public List<BookingDto> getOwnerBookings(Long userId, String state, int from, int size) {
-        BookingState bookingState;
-        try {
-            bookingState = BookingState.valueOf(state);
-        } catch (IllegalArgumentException e) {
-            String message = String.format("Unknown state: %s", state);
-            log.warn("ValidationException at BookingService.getOwnerBookings: {}", message);
-            throw new ValidationException(message);
-        }
+        BookingState bookingState = convertStringToBookingState(state);
         userService.getUserById(userId);
         List<Booking> bookings = new ArrayList<>();
         Pageable pageable = PageRequest.of(from / size, size);
@@ -174,6 +160,17 @@ public class BookingServiceImpl implements BookingService {
         log.info("BookingServiceImpl.updateBookingStatus: booking {} " +
                  "status successfully updated", booking.getId());
         return BookingMapper.toBookingDto(updatedBooking);
+    }
+
+    private BookingState convertStringToBookingState(String state) {
+        try {
+            return BookingState.valueOf(state);
+        } catch (IllegalArgumentException e) {
+            String message = String.format("Unknown state: %s", state);
+            log.warn("ValidationException at BookingServiceImpl.convertStringToBookingState: {}",
+                     message);
+            throw new ValidationException(message);
+        }
     }
 
     private void validateDataForAddBooking(Long userId, ItemDto itemDto, Booking booking) {
